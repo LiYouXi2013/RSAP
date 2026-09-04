@@ -1,0 +1,79 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0405
+header_name {.h}
+code_name {.cxx}
+Function {} {open
+} {
+  Fl_Window {} {
+    label RSAP open
+    xywh {444 296 303 320} type Double hide
+  } {
+    Fl_Menu_Bar {} {open
+      xywh {0 0 302 22} box PLASTIC_UP_BOX
+    } {}
+    Fl_Output {} {
+      xywh {0 22 302 198} box PLASTIC_DOWN_BOX textfont 1 textsize 200 textcolor 228
+    }
+    Fl_Button {} {
+      label Start
+      xywh {190 269 86 30} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelfont 1
+    }
+    Fl_Check_Button {} {
+      label {Auto Stop}
+      xywh {190 234 86 28} down_box DOWN_BOX labelfont 1
+    }
+    Fl_Box {} {
+      image {./icon.png} compress_image 1 xywh {0 220 180 100} align 512
+    }
+  }
+}
+
+Function {setting_wnd()} {open
+} {
+  Fl_Window {} {
+    label Settings open selected
+    xywh {476 312 365 167} type Double hide
+  } {
+    Fl_Group {} {
+      label {Chance Adjuster} open
+      xywh {0 15 190 152} box SHADOW_FRAME
+    } {
+      Fl_Spinner {} {
+        label {Weight:}
+        xywh {90 63 64 22}
+      }
+      Fl_Value_Input {} {
+        label {No.:}
+        xywh {90 33 64 22}
+      }
+      Fl_Button {} {
+        label Search
+        xywh {90 93 64 24}
+      }
+      Fl_Button {} {
+        label Apply
+        xywh {90 125 64 24}
+      }
+    }
+    Fl_Value_Input {} {
+      label {Auto Stop Time:}
+      xywh {301 10 64 22}
+    }
+    Fl_Button {} {
+      label OK
+      xywh {287 133 64 20}
+    }
+    Fl_Button {} {
+      label Cancel
+      xywh {202 133 64 20}
+    }
+    Fl_Button {} {
+      label {Check for Update}
+      xywh {223 95 115 20}
+    }
+    Fl_Value_Input {} {
+      label {Random Seed:}
+      xywh {301 40 64 22}
+    }
+  }
+}
