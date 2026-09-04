@@ -1,3 +1,5 @@
 *.exe
 RSAP.cpp
 RSAP.h
+*.ini
+.vscode/

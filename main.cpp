@@ -93,7 +93,7 @@ void cb_about(Fl_Widget*, void*) {
 
 	// 版本信息
 	Fl_Box info(0, 70, 360, 100,
-	            "Randomly Select A People: v0.0indev\n"
+	            "Randomly Select A PeoplPerson: v0.0indev\n"
 	            "Developed Using FLTK\n"
 	            "\n(c)2026 Candyman-RDFZ, LiYouXi2013 \nAll Rights Reserved.\n");
 	info.box(FL_NO_BOX);
