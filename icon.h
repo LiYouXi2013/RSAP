@@ -599,6 +599,6 @@ static const unsigned char idata_icon[] =
 static Fl_Image *image_icon() {
 	static Fl_Image *image = NULL;
 	if (!image)
-		image = new Fl_PNG_Image("icon.png", idata_icon, 12986);
+		image = new Fl_PNG_Image(NULL, idata_icon, 12986);
 	return image;
 }
