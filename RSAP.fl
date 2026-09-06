@@ -72,8 +72,11 @@ Function {setting_wnd()} {open
       xywh {223 95 115 20}
     }
     Fl_Value_Input {} {
-      label {Random Seed:}
-      xywh {301 40 64 22}
+      xywh {202 65 148 22}
+    }
+    Fl_Box {} {
+      label {Random Seed}
+      xywh {202 45 148 20} labelfont 1
     }
   }
 }

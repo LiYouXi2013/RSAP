@@ -1,6 +1,7 @@
 #include "randomPick.h"
 #include "readInt.h"
 #include <windows.h>
+#include <iostream>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
@@ -21,13 +22,34 @@ void cb_setting_ok(Fl_Widget*, void* ud);
 void RSAPinit();
 void RSAPsave();
 
+using namespace std;
+
 personVec class1;
 poolVec pool;
-int seed;
+uint32_t seed;
 double ast;
+bool isdef=false;
+
+class VI : public Fl_Value_Input {
+public:
+    VI(int x, int y, int w, int h, const char *l = 0)
+        : Fl_Value_Input(x, y, w, h, l) {}
+
+    // 2. 重写 format 方法
+    int format(char *buffer) override {
+        // 使用 snprintf 以 %lld 格式输出 long long
+        // 这样即使数值很大也能完整显示
+        long long val = (long long)this->value();
+        return snprintf(buffer, 128, "%lld", val);
+    }
+};
+
 
 int main(int argc, char **argv) {
 	RSAPinit();
+
+	cout<<seed<<endl;
+
 	for(int i=0;i<41;i++){
 		class1.push_back((Person){
 			"",1
@@ -54,6 +76,8 @@ int main(int argc, char **argv) {
 		disp->textfont(1);
 		disp->textsize(200);
 		disp->textcolor((Fl_Color)228);
+		disp->value(">v<");
+		disp->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 
 		Fl_Button* start = new Fl_Button(190, 269, 86, 30, "Start");
 		start->callback([](Fl_Widget*, void* a) {
@@ -93,7 +117,7 @@ void cb_about(Fl_Widget*, void*) {
 
 	// 版本信息
 	Fl_Box info(0, 70, 360, 100,
-	            "Randomly Select A PeoplPerson: v0.0indev\n"
+	            "Randomly Select A Person: v0.0indev\n"
 	            "Developed Using FLTK\n"
 	            "\n(c)2026 Candyman-RDFZ, LiYouXi2013 \nAll Rights Reserved.\n");
 	info.box(FL_NO_BOX);
@@ -120,18 +144,29 @@ void cb_setting(Fl_Widget*, void*) {
 	Fl_Group CAGrp(0, 15, 190, 152, "Chance Adjuster");
 	CAGrp.box(FL_SHADOW_FRAME);
 	Fl_Spinner spinner(90, 63, 64, 22, "Weight:");
-	Fl_Value_Input vi(90, 33, 64, 22, "No.:");
+	VI vi(90, 33, 64, 22, "No.:");
 	Fl_Button search(90, 93, 64, 24, "Search");
 	Fl_Button apply(90, 125, 64, 24, "Apply");
+	CAGrp.labelfont(1);
 	CAGrp.end();
-	Fl_Value_Input autostopt(301, 10, 64, 22, "Auto Stop Time:");
+	VI autostopt(301, 10, 64, 22, "Auto Stop Time:");
 	Fl_Button ok(287, 133, 64, 20, "OK");
 	Fl_Button cancel(202, 133, 64, 20, "Cancel");
 	Fl_Button CheckUPT(223, 95, 115, 20, "Check for Update");
-	Fl_Value_Input rseed(301, 40, 64, 22, "Random Seed:");
+	Fl_Box rseedb(202, 45, 148, 20, "Random Seed");
+	rseedb.labelfont(1);
+	VI rseed(202, 65, 148, 22, "");
+	rseed.value(seed);
+	rseed.step();
+
+	rseed.callback(cb_seed_changed);
+
 	cancel.callback([](Fl_Widget * w, void* ud) {
 		((Fl_Window*)ud)->hide();
 	}, &setting_wnd);
+
+	ok.callback(cb_setting_ok, &setting_wnd);
+
 	setting_wnd.end();
 
 	setting_wnd.show();
@@ -144,22 +179,33 @@ void cb_setting_ok(Fl_Widget*, void* ud) {
 	((Fl_Window*)ud)->hide();
 }
 
+void cb_seed_changed(Fl_Widget* w, void*) {
+	VI* vi = (VI*)w;
+	seed = (uint32_t)vi->value();
+	isdef=false;
+}
+
 void RSAPinit() {
 	seed = GetPrivateProfileIntA("RNG", "Seed", 0, "./settings.ini");
-	if(seed=0){
+	if(seed==0){
 		static std::random_device rd;
-		gen.seed(rd());
-	}else{
-		gen.seed(seed);
+		seed = rd();
+		isdef = true;
 	}
+	gen.seed(seed);
 }
 
 void RSAPsave(){
-	WritePrivateProfileStringA("RNG", "Seed", to_string(seed).c_str(), "./settings.ini");
-	if(seed=0){
-		static std::random_device rd;
-		gen.seed(rd());
+	cout<<seed<<endl;
+	if(isdef){
+		WritePrivateProfileStringA("RNG", "Seed", to_string(0).c_str(), "./settings.ini");
 	}else{
-		gen.seed(seed);
+		WritePrivateProfileStringA("RNG", "Seed", to_string(seed).c_str(), "./settings.ini");
 	}
+	if(seed==0){
+		static std::random_device rd;
+		seed = rd();
+	}
+	gen.seed(seed);
 }
+

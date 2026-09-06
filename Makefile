@@ -9,7 +9,7 @@ LDFLAGS = -lfltk_images -lfltk_png -lfltk_z -lfltk_jpeg \
 -static
 
 all: $(OBJS)
-	g++ -o build/main.exe $(OBJS) $(LDFLAGS) -mwindows
+	g++ -o build/main.exe $(OBJS) $(LDFLAGS) 
 
 build/%.o: %.cpp | build
 	g++ -c $< -o $@ -std=c++14 -Wall -Wextra -O2  
