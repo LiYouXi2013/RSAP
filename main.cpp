@@ -159,7 +159,7 @@ void cb_setting(Fl_Widget*, void*) {
 	rseed.value(seed);
 	rseed.step();
 
-	rseed.callback(cb_seed_changed);
+	// rseed.callback(cb_seed_changed);
 
 	cancel.callback([](Fl_Widget * w, void* ud) {
 		((Fl_Window*)ud)->hide();
