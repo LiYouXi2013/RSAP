@@ -8,7 +8,7 @@ LDFLAGS = -lfltk_images -lfltk_png -lfltk_z -lfltk_jpeg \
 -ladvapi32 -loleaut32 -lodbc32 -lkernel32 -luser32 \
 -static
 
-all: $(OBJS)
+all: clean $(OBJS)
 	g++ -o build/main.exe $(OBJS) $(LDFLAGS) 
 
 build/%.o: %.cpp | build
@@ -18,4 +18,4 @@ build:
 	mkdir build
 
 clean:
-	rm -rf build
+	rd /s /q build

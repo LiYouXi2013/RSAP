@@ -3,3 +3,4 @@ RSAP.h
 .vscode/
 build/
 main.exe
+settings.ini

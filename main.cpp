@@ -1,5 +1,6 @@
 #include "randomPick.h"
 #include "readInt.h"
+#include "customWidgets.h"
 #include <windows.h>
 #include <iostream>
 
@@ -19,6 +20,9 @@
 void cb_about(Fl_Widget*, void*);
 void cb_setting(Fl_Widget*, void*);
 void cb_setting_ok(Fl_Widget*, void* ud);
+void cb_seed_changed(Fl_Widget* w, void*);
+
+void startroll(Fl_Widget*, void* a);
 void RSAPinit();
 void RSAPsave();
 
@@ -29,25 +33,14 @@ poolVec pool;
 uint32_t seed;
 double ast;
 bool isdef=false;
-
-class VI : public Fl_Value_Input {
-public:
-    VI(int x, int y, int w, int h, const char *l = 0)
-        : Fl_Value_Input(x, y, w, h, l) {}
-
-    // 2. 重写 format 方法
-    int format(char *buffer) override {
-        // 使用 snprintf 以 %lld 格式输出 long long
-        // 这样即使数值很大也能完整显示
-        long long val = (long long)this->value();
-        return snprintf(buffer, 128, "%lld", val);
-    }
-};
-
+RFO* disp;
 
 int main(int argc, char **argv) {
 	RSAPinit();
-
+	putenv("FLTK_GDIPLUS=0");
+	
+	Fl::set_font(FL_HELVETICA, "Consolas");
+	Fl::set_font(FL_HELVETICA_BOLD, "BConsolas");
 	cout<<seed<<endl;
 
 	for(int i=0;i<41;i++){
@@ -58,33 +51,34 @@ int main(int argc, char **argv) {
 	
 	pool=buildPool(class1);
 	
-	Fl_Double_Window* window = new Fl_Double_Window(301, 320, "RSAP");
+	Fl_Double_Window* window = new Fl_Double_Window(300, 320, "RSAP");
 
 	{
 		Fl_Menu_Bar* bar = new Fl_Menu_Bar(0, 0, 300, 22);
-		bar->box(FL_PLASTIC_UP_BOX);
+		bar->box(FL_THIN_UP_BOX);
 		bar->add("&File/Open Settings", 0, cb_setting);
 		bar->add("&File/Exit", FL_CTRL + 'q', [](Fl_Widget * a, void* b) {
 			Fl_Double_Window *c = (Fl_Double_Window*)b;
 			c->hide();
 		}, window);
 		bar->add("&Help/About", FL_F + 1, cb_about);
-		bar->menu_box(FL_PLASTIC_UP_FRAME);
+		bar->color(FL_WHITE);
+		bar->selection_color(FL_BLUE);
+		
+		bar->callback([](Fl_Widget* w, void* ud){
+			Fl_Window* win= (Fl_Window*)ud;
+			win->redraw();
+		}, window);
 
-		Fl_Output* disp = new Fl_Output(0, 22, 300, 198);
+		disp = new RFO(0, 22, 300, 198);
 		disp->box(FL_PLASTIC_DOWN_BOX);
-		disp->textfont(1);
-		disp->textsize(200);
+		disp->fontsize(200);
 		disp->textcolor((Fl_Color)228);
-		disp->value(">v<");
-		disp->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+		disp->value("??");
+		window->add(disp);
 
 		Fl_Button* start = new Fl_Button(190, 269, 86, 30, "Start");
-		start->callback([](Fl_Widget*, void* a) {
-			Fl_Output* disp=(Fl_Output*)a;
-			int ii=randomPick(pool);
-			disp->value(to_string(ii+1).c_str());
-		},disp);
+		start->callback(startroll,disp);
 		start->box(FL_PLASTIC_UP_BOX);
 		start->down_box(FL_PLASTIC_DOWN_BOX);
 		start->labelfont(1);
@@ -159,7 +153,7 @@ void cb_setting(Fl_Widget*, void*) {
 	rseed.value(seed);
 	rseed.step();
 
-	// rseed.callback(cb_seed_changed);
+	rseed.callback(cb_seed_changed);
 
 	cancel.callback([](Fl_Widget * w, void* ud) {
 		((Fl_Window*)ud)->hide();
@@ -180,9 +174,19 @@ void cb_setting_ok(Fl_Widget*, void* ud) {
 }
 
 void cb_seed_changed(Fl_Widget* w, void*) {
+	cout<<"cb_seed_changed"<<endl;
 	VI* vi = (VI*)w;
 	seed = (uint32_t)vi->value();
 	isdef=false;
+	if(seed==0)isdef=true;
+	cout<<"Seed changed to "<<seed<<endl;
+}
+
+
+
+void startroll(Fl_Widget*, void* a) {
+	int ii=randomPick(pool);
+	disp->value(to_string(ii+1).c_str());
 }
 
 void RSAPinit() {
@@ -198,13 +202,15 @@ void RSAPinit() {
 void RSAPsave(){
 	cout<<seed<<endl;
 	if(isdef){
-		WritePrivateProfileStringA("RNG", "Seed", to_string(0).c_str(), "./settings.ini");
+		WritePrivateProfileStringA("RNG", "Seed", to_string(0).c_str(), "settings.ini");
+		cout<<"used def ";
 	}else{
-		WritePrivateProfileStringA("RNG", "Seed", to_string(seed).c_str(), "./settings.ini");
+		WritePrivateProfileStringA("RNG", "Seed", to_string(seed).c_str(), "settings.ini");
 	}
 	if(seed==0){
 		static std::random_device rd;
 		seed = rd();
+		cout<<"rd seed:"<<seed<<endl;
 	}
 	gen.seed(seed);
 }
