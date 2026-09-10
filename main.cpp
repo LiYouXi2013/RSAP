@@ -202,10 +202,10 @@ void RSAPinit() {
 void RSAPsave(){
 	cout<<seed<<endl;
 	if(isdef){
-		WritePrivateProfileStringA("RNG", "Seed", to_string(0).c_str(), "settings.ini");
+		WritePrivateProfileStringA("RNG", "Seed", to_string(0).c_str(), "./settings.ini");
 		cout<<"used def ";
 	}else{
-		WritePrivateProfileStringA("RNG", "Seed", to_string(seed).c_str(), "settings.ini");
+		WritePrivateProfileStringA("RNG", "Seed", to_string(seed).c_str(), "./settings.ini");
 	}
 	if(seed==0){
 		static std::random_device rd;

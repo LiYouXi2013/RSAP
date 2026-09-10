@@ -18,4 +18,4 @@ build:
 	mkdir build
 
 clean:
-	rd /s /q build
+	del build\*.* /q
