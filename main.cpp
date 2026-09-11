@@ -21,6 +21,7 @@ void cb_about(Fl_Widget*, void*);
 void cb_setting(Fl_Widget*, void*);
 void cb_setting_ok(Fl_Widget*, void* ud);
 void cb_seed_changed(Fl_Widget* w, void*);
+void cb_tgas(Fl_Widget* a,void*);
 
 void startroll(Fl_Widget*, void* a);
 void RSAPinit();
@@ -34,6 +35,8 @@ uint32_t seed;
 double ast;
 bool isdef=false;
 RFO* disp;
+uint32_t ats;
+bool as=false;
 
 int main(int argc, char **argv) {
 	RSAPinit();
@@ -190,7 +193,9 @@ void startroll(Fl_Widget*, void* a) {
 }
 
 void RSAPinit() {
-	seed = GetPrivateProfileIntA("RNG", "Seed", 0, "./settings.ini");
+	seed = GetPrivateProfileIntA("General", "Seed", 0, "./settings.ini");
+	ast = GetPrivateProfileIntA("General", "AST", 0, "./settings.ini");
+
 	if(seed==0){
 		static std::random_device rd;
 		seed = rd();
@@ -202,10 +207,10 @@ void RSAPinit() {
 void RSAPsave(){
 	cout<<seed<<endl;
 	if(isdef){
-		WritePrivateProfileStringA("RNG", "Seed", to_string(0).c_str(), "./settings.ini");
+		WritePrivateProfileStringA("RNG", "General", to_string(0).c_str(), "./settings.ini");
 		cout<<"used def ";
 	}else{
-		WritePrivateProfileStringA("RNG", "Seed", to_string(seed).c_str(), "./settings.ini");
+		WritePrivateProfileStringA("RNG", "General", to_string(seed).c_str(), "./settings.ini");
 	}
 	if(seed==0){
 		static std::random_device rd;

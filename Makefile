@@ -18,4 +18,5 @@ build:
 	mkdir build
 
 clean:
-	del build\*.* /q
+	del build\*.o /q
+	del build\main.exe
