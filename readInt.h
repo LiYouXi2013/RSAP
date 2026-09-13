@@ -29,3 +29,12 @@ vector<int> readInt(const string& t){
 	
 	return res;
 }
+
+std::string join(const std::vector<int>& v) {
+    std::string s;
+    for (size_t i = 0; i < v.size(); ++i) {
+        if (i > 0) s += ',';
+        s += std::to_string(v[i]);
+    }
+    return s;
+}

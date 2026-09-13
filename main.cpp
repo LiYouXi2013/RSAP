@@ -3,6 +3,8 @@
 #include "customWidgets.h"
 #include <windows.h>
 #include <iostream>
+#include <sys/timeb.h>
+// #include <sys/yjy>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
@@ -15,13 +17,16 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Spinner.H>
 #include <FL/Fl_Value_Input.H>
+#include <Fl/fl_ask.H>
 #include "icon.h"
 
 void cb_about(Fl_Widget*, void*);
 void cb_setting(Fl_Widget*, void*);
 void cb_setting_ok(Fl_Widget*, void* ud);
 void cb_seed_changed(Fl_Widget* w, void*);
-void cb_tgas(Fl_Widget* a,void*);
+void cb_ast_changed(Fl_Widget* w, void*);
+void cb_search(Fl_Widget*, void*);
+void cb_apply(Fl_Widget*, void*);
 
 void startroll(Fl_Widget*, void* a);
 void RSAPinit();
@@ -35,8 +40,12 @@ uint32_t seed;
 double ast;
 bool isdef=false;
 RFO* disp;
+Fl_Button* start;
 uint32_t ats;
 bool as=false;
+struct timeb tick;
+int cc;
+vector<int> weightdq;
 
 int main(int argc, char **argv) {
 	RSAPinit();
@@ -45,12 +54,6 @@ int main(int argc, char **argv) {
 	Fl::set_font(FL_HELVETICA, "Consolas");
 	Fl::set_font(FL_HELVETICA_BOLD, "BConsolas");
 	cout<<seed<<endl;
-
-	for(int i=0;i<41;i++){
-		class1.push_back((Person){
-			"",1
-		});
-	}
 	
 	pool=buildPool(class1);
 	
@@ -80,7 +83,7 @@ int main(int argc, char **argv) {
 		disp->value("??");
 		window->add(disp);
 
-		Fl_Button* start = new Fl_Button(190, 269, 86, 30, "Start");
+		start = new Fl_Button(190, 269, 86, 30, "Start");
 		start->callback(startroll,disp);
 		start->box(FL_PLASTIC_UP_BOX);
 		start->down_box(FL_PLASTIC_DOWN_BOX);
@@ -90,6 +93,10 @@ int main(int argc, char **argv) {
 		Fl_Check_Button* autostop = new Fl_Check_Button(190, 234, 86, 28, "Auto Stop");
 		autostop->down_box(FL_DOWN_BOX);
 		autostop->labelfont(1);
+		autostop->callback([](Fl_Widget* w, void* ud){
+			Fl_Check_Button* cb = (Fl_Check_Button*)w;
+			as = cb->value();
+		}, nullptr);
 
 		Fl_Box* icon = new Fl_Box(0, 220, 180, 100);
 		icon->image( image_icon() );
@@ -135,44 +142,50 @@ void cb_about(Fl_Widget*, void*) {
 
 }
 
+Fl_Spinner* spinner;
+VI* novi; 
+
 void cb_setting(Fl_Widget*, void*) {
-	Fl_Window setting_wnd(365, 167, "Settings");
-	setting_wnd.set_modal();
-	Fl_Group CAGrp(0, 15, 190, 152, "Chance Adjuster");
-	CAGrp.box(FL_SHADOW_FRAME);
-	Fl_Spinner spinner(90, 63, 64, 22, "Weight:");
-	VI vi(90, 33, 64, 22, "No.:");
-	Fl_Button search(90, 93, 64, 24, "Search");
-	Fl_Button apply(90, 125, 64, 24, "Apply");
-	CAGrp.labelfont(1);
-	CAGrp.end();
-	VI autostopt(301, 10, 64, 22, "Auto Stop Time:");
-	Fl_Button ok(287, 133, 64, 20, "OK");
-	Fl_Button cancel(202, 133, 64, 20, "Cancel");
-	Fl_Button CheckUPT(223, 95, 115, 20, "Check for Update");
-	Fl_Box rseedb(202, 45, 148, 20, "Random Seed");
-	rseedb.labelfont(1);
-	VI rseed(202, 65, 148, 22, "");
-	rseed.value(seed);
-	rseed.step();
+	Fl_Window* setting_wnd = new Fl_Window(365, 167, "Settings");
+	setting_wnd->set_modal();
+	Fl_Group* CAGrp = new Fl_Group(0, 15, 190, 152, "Chance Adjuster");
+	CAGrp->box(FL_SHADOW_FRAME);
+	spinner = new Fl_Spinner(90, 63, 64, 22, "Weight:");
+	novi = new VI(90, 33, 64, 22, "No.:");
+	Fl_Button* search = new Fl_Button(90, 93, 64, 24, "Search");
+	Fl_Button* apply = new Fl_Button(90, 125, 64, 24, "Apply");
+	CAGrp->labelfont(1);
+	CAGrp->end();
+	VI* autostopt = new VI(301, 10, 64, 22, "Auto Stop Time:");
+	autostopt->value(ast);
+	Fl_Button* ok = new Fl_Button(287, 133, 64, 20, "OK");
+	Fl_Button* cancel = new Fl_Button(202, 133, 64, 20, "Cancel");
+	Fl_Button* CheckUPT = new Fl_Button(223, 95, 115, 20, "Check for Update");
+	Fl_Box* rseedb = new Fl_Box(202, 45, 148, 20, "Random Seed");
+	rseedb->labelfont(1);
+	VI* rseed = new VI(202, 65, 148, 22, "");
+	rseed->value(seed);
 
-	rseed.callback(cb_seed_changed);
+	search->callback(cb_search);
+	apply->callback(cb_apply);
+	rseed->callback(cb_seed_changed);
+	autostopt->callback(cb_ast_changed);
 
-	cancel.callback([](Fl_Widget * w, void* ud) {
+	cancel->callback([](Fl_Widget * w, void* ud) {
 		((Fl_Window*)ud)->hide();
 	}, &setting_wnd);
 
-	ok.callback(cb_setting_ok, &setting_wnd);
+	ok->callback(cb_setting_ok, setting_wnd);
 
-	setting_wnd.end();
+	setting_wnd->end();
 
-	setting_wnd.show();
-	while (setting_wnd.shown()) Fl::wait();
+	setting_wnd->show();
+	while (setting_wnd->shown()) Fl::wait();
 }
 
 void cb_setting_ok(Fl_Widget*, void* ud) {
 	RSAPsave();
-
+	cout<<"saved"<<endl;
 	((Fl_Window*)ud)->hide();
 }
 
@@ -185,17 +198,84 @@ void cb_seed_changed(Fl_Widget* w, void*) {
 	cout<<"Seed changed to "<<seed<<endl;
 }
 
+void cb_ast_changed(Fl_Widget* w, void*) {
+	cout<<"cb_ast_changed"<<endl;
+	VI* vi = (VI*)w;
+	ast = (uint32_t)vi->value();
+}
 
+void cb_search(Fl_Widget*, void*) {
+	int no = (int)novi->value();
+	if(no<1 || no>class1.size()){
+		spinner->value(-1);
+		return;
+	}
 
-void startroll(Fl_Widget*, void* a) {
+	spinner->value(class1[no-1].weight);
+}
+
+void cb_apply(Fl_Widget*, void*) {
+	int no = (int)novi->value();
+	if(no<1 || no>class1.size() || spinner->value()<0){
+		fl_alert("Invalid input!");
+		return;
+	}
+
+	class1[no-1].weight = (int)spinner->value();
+	weightdq[no-1] = (int)spinner->value();
+	pool = buildPool(class1);
+	fl_message("Weight of No.%d has been changed to %d.", no, class1[no-1].weight);
+}
+
+bool di=false;
+
+void do_a_roll(void* data) {
+	di=true;
 	int ii=randomPick(pool);
 	disp->value(to_string(ii+1).c_str());
+	cc--;
+	if(cc>0){
+    	Fl::repeat_timeout(0.1, do_a_roll);
+		start->copy_label(("Stop\nLeft: "+to_string(cc)).c_str());
+	}else{
+		di=false;
+		start->copy_label("Start");
+	}
+}
+
+void startroll(Fl_Widget*, void* a) {
+	if(di){
+		di=false;
+		Fl::remove_timeout(do_a_roll);
+		start->copy_label("Start");
+		return;
+	}
+	cout<<"AS:"<<as<<endl;
+	if(!as){
+		int ii=randomPick(pool);
+		disp->value(to_string(ii+1).c_str());
+	}else{
+		ftime(&tick);
+		cc=ast/100;
+		Fl::add_timeout(0, do_a_roll);
+	}
 }
 
 void RSAPinit() {
 	seed = GetPrivateProfileIntA("General", "Seed", 0, "./settings.ini");
 	ast = GetPrivateProfileIntA("General", "AST", 0, "./settings.ini");
+	
+	char t1[65536];
+	GetPrivateProfileStringA("General", "Weight", "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1", t1, sizeof(t1), "./settings.ini");
+	string weightdq_str = t1;
+	weightdq = readInt(weightdq_str);
 
+	for(int i : weightdq){
+		class1.push_back((Person){
+			"",i
+		});
+	}
+	
 	if(seed==0){
 		static std::random_device rd;
 		seed = rd();
@@ -207,10 +287,10 @@ void RSAPinit() {
 void RSAPsave(){
 	cout<<seed<<endl;
 	if(isdef){
-		WritePrivateProfileStringA("RNG", "General", to_string(0).c_str(), "./settings.ini");
+		WritePrivateProfileStringA("General", "Seed", to_string(0).c_str(), "./settings.ini");
 		cout<<"used def ";
 	}else{
-		WritePrivateProfileStringA("RNG", "General", to_string(seed).c_str(), "./settings.ini");
+		WritePrivateProfileStringA("General", "Seed", to_string(seed).c_str(), "./settings.ini");
 	}
 	if(seed==0){
 		static std::random_device rd;
@@ -218,5 +298,8 @@ void RSAPsave(){
 		cout<<"rd seed:"<<seed<<endl;
 	}
 	gen.seed(seed);
+	
+	WritePrivateProfileStringA("General", "AST", to_string(ast).c_str(), "./settings.ini");
+	WritePrivateProfileStringA("General", "Weight", join(weightdq).c_str(), "./settings.ini");
 }
 
