@@ -50,6 +50,8 @@ vector<int> weightdq;
 int main(int argc, char **argv) {
 	RSAPinit();
 	putenv("FLTK_GDIPLUS=0");
+	HWND hwnd=FindWindow(NULL,"RSAP");
+	SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0,SWP_NOSIZE);
 	
 	Fl::set_font(FL_HELVETICA, "Consolas");
 	Fl::set_font(FL_HELVETICA_BOLD, "BConsolas");
@@ -121,7 +123,7 @@ void cb_about(Fl_Widget*, void*) {
 
 	// 版本信息
 	Fl_Box info(0, 70, 360, 100,
-	            "Randomly Select A Person: v0.0indev\n"
+	            "Randomly Select A Person: v0.1indev\n"
 	            "Developed Using FLTK\n"
 	            "\n(c)2026 Candyman-RDFZ, LiYouXi2013 \nAll Rights Reserved.\n");
 	info.box(FL_NO_BOX);
@@ -173,7 +175,7 @@ void cb_setting(Fl_Widget*, void*) {
 
 	cancel->callback([](Fl_Widget * w, void* ud) {
 		((Fl_Window*)ud)->hide();
-	}, &setting_wnd);
+	}, setting_wnd);
 
 	ok->callback(cb_setting_ok, setting_wnd);
 
@@ -266,7 +268,7 @@ void RSAPinit() {
 	ast = GetPrivateProfileIntA("General", "AST", 0, "./settings.ini");
 	
 	char t1[65536];
-	GetPrivateProfileStringA("General", "Weight", "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1", t1, sizeof(t1), "./settings.ini");
+	GetPrivateProfileStringA("General", "Weight", "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1", t1, sizeof(t1), "./settings.ini");
 	string weightdq_str = t1;
 	weightdq = readInt(weightdq_str);
 
