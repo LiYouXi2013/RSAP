@@ -3,6 +3,7 @@
 #include "customWidgets.h"
 #include <windows.h>
 #include <iostream>
+#include <string.h>
 #include <sys/timeb.h>
 // #include <sys/yjy>
 
@@ -46,6 +47,18 @@ bool as=false;
 struct timeb tick;
 int cc;
 vector<int> weightdq;
+
+vector<string> class1name = {
+	"冯心仪", "胡熙冉", "李景仪", "齐泽雨", "田依暄",
+	"王锦璠", "王逸舟", "谢卓妍", "邢与庭", "鄢紫羲",
+	"袁家怡", "战清欢", "赵骐萱", "周雨泉", "邹佳晨",
+	"安昱",   "李尚",   "郭佳诺", "韩津桐", "胡煜橦",
+	"黄之尧", "纪千豪", "李宥羲", "李宇新", "李宗泽",
+	"马悠然", "孙一硕", "唐启轩", "田雨瑞", "胥林昊",
+	"张嘉宸", "张嘉彧", "赵康迪", "赵天予", "赵奕茗",
+	"赵逸和", "郑博睿", "郑峻宇", "周泓予", "周雨辰",
+	"孙奕萱"
+};
 
 int main(int argc, char **argv) {
 	RSAPinit();
@@ -224,7 +237,6 @@ void cb_apply(Fl_Widget*, void*) {
 	}
 
 	class1[no-1].weight = (int)spinner->value();
-	weightdq[no-1] = (int)spinner->value();
 	pool = buildPool(class1);
 	fl_message("Weight of No.%d has been changed to %d.", no, class1[no-1].weight);
 }
@@ -268,9 +280,9 @@ void RSAPinit() {
 	ast = GetPrivateProfileIntA("General", "AST", 0, "./settings.ini");
 	
 	char t1[65536];
-	GetPrivateProfileStringA("General", "Weight", "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1", t1, sizeof(t1), "./settings.ini");
-	string weightdq_str = t1;
-	weightdq = readInt(weightdq_str);
+	GetPrivateProfileStringA("General", "Weight", "TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,NULL-0,TESTNAME-1,TESTNAME-1,TESTNAME-1", t1, sizeof(t1), "./settings.ini");
+	string t_str = t1;
+	class1 = readInt(t_str);
 
 	for(int i : weightdq){
 		class1.push_back((Person){
@@ -302,6 +314,6 @@ void RSAPsave(){
 	gen.seed(seed);
 	
 	WritePrivateProfileStringA("General", "AST", to_string(ast).c_str(), "./settings.ini");
-	WritePrivateProfileStringA("General", "Weight", join(weightdq).c_str(), "./settings.ini");
+	WritePrivateProfileStringA("General", "Weight", join(class1).c_str(), "./settings.ini");
 }
 

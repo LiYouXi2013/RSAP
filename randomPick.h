@@ -8,7 +8,7 @@ static mt19937 gen(0);
 
 struct Person {
 	string name = "";
-	int weight;
+	int weight = 1;
 };
 
 vector<int> buildPool(const vector<Person>& lst) {
