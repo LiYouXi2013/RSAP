@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 	
 	Fl::set_font(FL_HELVETICA, "Consolas");
 	Fl::set_font(FL_HELVETICA_BOLD, "BConsolas");
-	Fl::set_font(FL_HELVETICA_ITALIC, "BFZYTK");
+	Fl::set_font(FL_HELVETICA_ITALIC, "Huiwen-Fangsong");
 	cout<<seed<<endl;
 	
 	pool=buildPool(class1);
@@ -107,9 +107,11 @@ int main(int argc, char **argv) {
 		icon->image( image_icon() );
 		icon->align(Fl_Align(512));
 
-		no = new Fl_Output(210, 220, 92, 20);
+		no = new Fl_Output(200, 188, 120, 32);
 		no->box(FL_UP_BOX);
 		no->textfont(FL_HELVETICA_ITALIC);
+		no->textsize(30);
+		no->parent()->add(no);
 	}
 	window->end();
 	window->show(argc, argv);
@@ -132,7 +134,9 @@ void cb_about(Fl_Widget*, void*) {
 	Fl_Box info(0, 70, 360, 100,
 	            "Randomly Select A Person: v0.1indev\n"
 	            "Developed Using FLTK\n"
-	            "\n(c)2026 Candyman-RDFZ, LiYouXi2013 \nAll Rights Reserved.\n");
+	            "\n(c)2026 Candyman-RDFZ, LiYouXi2013 \nAll Rights Reserved.\n"
+				"\n\nFonts: Consolas, BConsolas, 汇文明朝体"
+			);
 	info.box(FL_NO_BOX);
 	info.labelsize(14);
 	info.align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
