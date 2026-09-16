@@ -42,23 +42,12 @@ double ast;
 bool isdef=false;
 RFO* disp;
 Fl_Button* start;
+Fl_Output* no;
 uint32_t ats;
 bool as=false;
 struct timeb tick;
 int cc;
 vector<int> weightdq;
-
-vector<string> class1name = {
-	"冯心仪", "胡熙冉", "李景仪", "齐泽雨", "田依暄",
-	"王锦璠", "王逸舟", "谢卓妍", "邢与庭", "鄢紫羲",
-	"袁家怡", "战清欢", "赵骐萱", "周雨泉", "邹佳晨",
-	"安昱",   "李尚",   "郭佳诺", "韩津桐", "胡煜橦",
-	"黄之尧", "纪千豪", "李宥羲", "李宇新", "李宗泽",
-	"马悠然", "孙一硕", "唐启轩", "田雨瑞", "胥林昊",
-	"张嘉宸", "张嘉彧", "赵康迪", "赵天予", "赵奕茗",
-	"赵逸和", "郑博睿", "郑峻宇", "周泓予", "周雨辰",
-	"孙奕萱"
-};
 
 int main(int argc, char **argv) {
 	RSAPinit();
@@ -68,6 +57,7 @@ int main(int argc, char **argv) {
 	
 	Fl::set_font(FL_HELVETICA, "Consolas");
 	Fl::set_font(FL_HELVETICA_BOLD, "BConsolas");
+	Fl::set_font(FL_HELVETICA_ITALIC, "BFZYTK");
 	cout<<seed<<endl;
 	
 	pool=buildPool(class1);
@@ -105,7 +95,7 @@ int main(int argc, char **argv) {
 		start->labelfont(1);
 		
 
-		Fl_Check_Button* autostop = new Fl_Check_Button(190, 234, 86, 28, "Auto Stop");
+		Fl_Check_Button* autostop = new Fl_Check_Button(190, 241, 86, 28, "Auto Stop");
 		autostop->down_box(FL_DOWN_BOX);
 		autostop->labelfont(1);
 		autostop->callback([](Fl_Widget* w, void* ud){
@@ -116,6 +106,10 @@ int main(int argc, char **argv) {
 		Fl_Box* icon = new Fl_Box(0, 220, 180, 100);
 		icon->image( image_icon() );
 		icon->align(Fl_Align(512));
+
+		no = new Fl_Output(210, 220, 92, 20);
+		no->box(FL_UP_BOX);
+		no->textfont(FL_HELVETICA_ITALIC);
 	}
 	window->end();
 	window->show(argc, argv);
@@ -247,6 +241,7 @@ void do_a_roll(void* data) {
 	di=true;
 	int ii=randomPick(pool);
 	disp->value(to_string(ii+1).c_str());
+	no->value(class1[ii].name.c_str());
 	cc--;
 	if(cc>0){
     	Fl::repeat_timeout(0.1, do_a_roll);
@@ -268,6 +263,7 @@ void startroll(Fl_Widget*, void* a) {
 	if(!as){
 		int ii=randomPick(pool);
 		disp->value(to_string(ii+1).c_str());
+		no->value(class1[ii].name.c_str());
 	}else{
 		ftime(&tick);
 		cc=ast/100;
@@ -280,7 +276,7 @@ void RSAPinit() {
 	ast = GetPrivateProfileIntA("General", "AST", 0, "./settings.ini");
 	
 	char t1[65536];
-	GetPrivateProfileStringA("General", "Weight", "TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,TESTNAME-1,NULL-0,TESTNAME-1,TESTNAME-1,TESTNAME-1", t1, sizeof(t1), "./settings.ini");
+	GetPrivateProfileStringA("General", "Weight", "冯心仪-1,胡熙冉-1,李景仪-1,齐泽雨-1,田依暄-1,王锦璠-1,王逸舟-1,谢卓妍-1,邢与庭-1,鄢紫羲-1,袁家怡-1,战清欢-1,赵骐萱-1,周雨泉-1,邹佳晨-1,安昱-1,李尚-1,郭佳诺-1,韩津桐-1,胡煜橦-1,黄之尧-1,纪千豪-1,李宥羲-1,李宇新-1,李宗泽-1,马悠然-1,孙一硕-1,唐启轩-1,田雨瑞-1,胥林昊-1,张嘉宸-1,张嘉彧-1,赵康迪-1,赵天予-1,赵奕茗-1,赵逸和-1,郑博睿-1,郑峻宇-0,周泓予-1,周雨辰-1,孙奕萱-1", t1, sizeof(t1), "./settings.ini");
 	string t_str = t1;
 	class1 = readInt(t_str);
 

@@ -6,7 +6,7 @@ Function {} {open
 } {
   Fl_Window {} {
     label RSAP open
-    xywh {444 296 303 320} type Double hide
+    xywh {606 323 303 320} type Double visible
   } {
     Fl_Menu_Bar {} {open
       xywh {0 0 302 22} box PLASTIC_UP_BOX
@@ -19,11 +19,14 @@ Function {} {open
       xywh {190 269 86 30} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX labelfont 1
     }
     Fl_Check_Button {} {
-      label {Auto Stop}
-      xywh {190 234 86 28} down_box DOWN_BOX labelfont 1
+      label {Auto Stop} selected
+      xywh {190 241 86 28} down_box DOWN_BOX labelfont 1
     }
     Fl_Box {} {
       image {./icon.png} compress_image 1 xywh {0 220 180 100} align 512
+    }
+    Fl_Output {} {
+      xywh {210 220 92 20} box GTK_THIN_DOWN_BOX
     }
   }
 }
@@ -31,7 +34,7 @@ Function {} {open
 Function {setting_wnd()} {open
 } {
   Fl_Window {} {
-    label Settings open selected
+    label Settings open
     xywh {476 312 365 167} type Double hide
   } {
     Fl_Group {} {
