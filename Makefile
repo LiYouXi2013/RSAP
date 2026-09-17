@@ -11,6 +11,9 @@ LDFLAGS = -lfltk_images -lfltk_png -lfltk_z -lfltk_jpeg \
 all: clean $(OBJS)
 	g++ -o build/main.exe $(OBJS) $(LDFLAGS) 
 
+run: all
+	cd build&&main.exe
+
 build/%.o: %.cpp | build
 	g++ -c $< -o $@ -std=c++14 -Wall -Wextra -O2  
 

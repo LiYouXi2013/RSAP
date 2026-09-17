@@ -52,7 +52,7 @@ vector<int> weightdq;
 int main(int argc, char **argv) {
 	RSAPinit();
 	putenv("FLTK_GDIPLUS=0");
-	HWND hwnd=FindWindow(NULL,"RSAP");
+	HWND hwnd = FindWindowA(NULL,"RSAP");
 	SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0,SWP_NOSIZE);
 	
 	Fl::set_font(FL_HELVETICA, "Consolas");
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
 			win->redraw();
 		}, window);
 
-		disp = new RFO(0, 22, 300, 198);
+		disp = new RFO(0, 22, 300, 188);
 		disp->box(FL_PLASTIC_DOWN_BOX);
 		disp->fontsize(200);
 		disp->textcolor((Fl_Color)228);
@@ -107,8 +107,8 @@ int main(int argc, char **argv) {
 		icon->image( image_icon() );
 		icon->align(Fl_Align(512));
 
-		no = new Fl_Output(200, 188, 120, 32);
-		no->box(FL_UP_BOX);
+		no = new Fl_Output(200, 210, 120, 32);
+		no->box(FL_THIN_DOWN_BOX);
 		no->textfont(FL_HELVETICA_ITALIC);
 		no->textsize(30);
 		no->parent()->add(no);
@@ -135,7 +135,7 @@ void cb_about(Fl_Widget*, void*) {
 	            "Randomly Select A Person: v0.1indev\n"
 	            "Developed Using FLTK\n"
 	            "\n(c)2026 Candyman-RDFZ, LiYouXi2013 \nAll Rights Reserved.\n"
-				"\n\nFonts: Consolas, BConsolas, 汇文明朝体"
+				"\n\nFonts: Consolas, BConsolas, 汇文仿宋"
 			);
 	info.box(FL_NO_BOX);
 	info.labelsize(14);
