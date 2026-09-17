@@ -23,6 +23,7 @@
 
 void cb_about(Fl_Widget*, void*);
 void cb_setting(Fl_Widget*, void*);
+void cb_pplsettings(Fl_Widget*, void*);
 void cb_setting_ok(Fl_Widget*, void* ud);
 void cb_seed_changed(Fl_Widget* w, void*);
 void cb_ast_changed(Fl_Widget* w, void*);
@@ -67,11 +68,8 @@ int main(int argc, char **argv) {
 	{
 		Fl_Menu_Bar* bar = new Fl_Menu_Bar(0, 0, 300, 22);
 		bar->box(FL_THIN_UP_BOX);
-		bar->add("&File/Open Settings", 0, cb_setting);
-		bar->add("&File/Exit", FL_CTRL + 'q', [](Fl_Widget * a, void* b) {
-			Fl_Double_Window *c = (Fl_Double_Window*)b;
-			c->hide();
-		}, window);
+		bar->add("&Settings/Open Settings", 0, cb_setting);
+		bar->add("&Settings/People Settings", 0, cb_pplsettings);
 		bar->add("&Help/About", FL_F + 1, cb_about);
 		bar->color(FL_WHITE);
 		bar->selection_color(FL_BLUE);
@@ -159,28 +157,18 @@ Fl_Spinner* spinner;
 VI* novi; 
 
 void cb_setting(Fl_Widget*, void*) {
-	Fl_Window* setting_wnd = new Fl_Window(365, 167, "Settings");
+	Fl_Window* setting_wnd = new Fl_Window(235, 167, "Settings");
 	setting_wnd->set_modal();
-	Fl_Group* CAGrp = new Fl_Group(0, 15, 190, 152, "Chance Adjuster");
-	CAGrp->box(FL_SHADOW_FRAME);
-	spinner = new Fl_Spinner(90, 63, 64, 22, "Weight:");
-	novi = new VI(90, 33, 64, 22, "No.:");
-	Fl_Button* search = new Fl_Button(90, 93, 64, 24, "Search");
-	Fl_Button* apply = new Fl_Button(90, 125, 64, 24, "Apply");
-	CAGrp->labelfont(1);
-	CAGrp->end();
-	VI* autostopt = new VI(301, 10, 64, 22, "Auto Stop Time:");
+	VI* autostopt = new VI(151, 10, 64, 22, "Auto Stop Time:");
 	autostopt->value(ast);
-	Fl_Button* ok = new Fl_Button(287, 133, 64, 20, "OK");
-	Fl_Button* cancel = new Fl_Button(202, 133, 64, 20, "Cancel");
-	Fl_Button* CheckUPT = new Fl_Button(223, 95, 115, 20, "Check for Update");
-	Fl_Box* rseedb = new Fl_Box(202, 45, 148, 20, "Random Seed");
+	Fl_Button* ok = new Fl_Button(117, 133, 64, 20, "OK");
+	Fl_Button* cancel = new Fl_Button(32, 133, 64, 20, "Cancel");
+	Fl_Button* CheckUPT = new Fl_Button(53, 95, 115, 20, "Check for Update");
+	Fl_Box* rseedb = new Fl_Box(32, 45, 148, 20, "Random Seed");
 	rseedb->labelfont(1);
-	VI* rseed = new VI(202, 65, 148, 22, "");
+	VI* rseed = new VI(32, 65, 148, 22, "");
 	rseed->value(seed);
 
-	search->callback(cb_search);
-	apply->callback(cb_apply);
 	rseed->callback(cb_seed_changed);
 	autostopt->callback(cb_ast_changed);
 
@@ -194,6 +182,26 @@ void cb_setting(Fl_Widget*, void*) {
 
 	setting_wnd->show();
 	while (setting_wnd->shown()) Fl::wait();
+}
+
+void cb_pplsettings(Fl_Widget*, void*){
+	Fl_Window* setting_wnd = new Fl_Window(381, 165, "Settings");
+	setting_wnd->set_modal();
+	Fl_Group* CAGrp = new Fl_Group(0, 15, 190, 152, "Chance Adjuster");
+	CAGrp->box(FL_SHADOW_FRAME);
+	spinner = new Fl_Spinner(90, 63, 64, 22, "Weight:");
+	novi = new VI(90, 33, 64, 22, "No.:");
+	Fl_Button* search = new Fl_Button(90, 93, 64, 24, "Search");
+	Fl_Button* apply = new Fl_Button(90, 125, 64, 24, "Apply");
+	CAGrp->labelfont(1);
+	CAGrp->end();
+
+	search->callback(cb_search);
+	apply->callback(cb_apply);
+
+	setting_wnd->end();
+	setting_wnd->show();
+	while (setting_wnd->shown())Fl::wait();
 }
 
 void cb_setting_ok(Fl_Widget*, void* ud) {
@@ -246,6 +254,7 @@ void do_a_roll(void* data) {
 	int ii=randomPick(pool);
 	disp->value(to_string(ii+1).c_str());
 	no->value(class1[ii].name.c_str());
+	no->redraw();
 	cc--;
 	if(cc>0){
     	Fl::repeat_timeout(0.1, do_a_roll);
@@ -268,6 +277,7 @@ void startroll(Fl_Widget*, void* a) {
 		int ii=randomPick(pool);
 		disp->value(to_string(ii+1).c_str());
 		no->value(class1[ii].name.c_str());
+		no->redraw();
 	}else{
 		ftime(&tick);
 		cc=ast/100;
