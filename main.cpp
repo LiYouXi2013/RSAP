@@ -19,7 +19,6 @@
 #include <FL/Fl_Spinner.H>
 #include <FL/Fl_Value_Input.H>
 #include <Fl/fl_ask.H>
-#include "icon.h"
 
 void cb_about(Fl_Widget*, void*);
 void cb_setting(Fl_Widget*, void*);
@@ -53,7 +52,7 @@ vector<int> weightdq;
 int main(int argc, char **argv) {
 	RSAPinit();
 	putenv("FLTK_GDIPLUS=0");
-	HWND hwnd = FindWindowA(NULL,"RSAP");
+	HWND hwnd = FindWindowA(NULL,"RSAP");cout<<"HWND"<<hwnd<<endl;
 	SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0,SWP_NOSIZE);
 	
 	Fl::set_font(FL_HELVETICA, "Consolas");
@@ -66,34 +65,21 @@ int main(int argc, char **argv) {
 	Fl_Double_Window* window = new Fl_Double_Window(300, 320, "RSAP");
 
 	{
-		Fl_Menu_Bar* bar = new Fl_Menu_Bar(0, 0, 300, 22);
-		bar->box(FL_THIN_UP_BOX);
-		bar->add("&Settings/Open Settings", 0, cb_setting);
-		bar->add("&Settings/People Settings", 0, cb_pplsettings);
-		bar->add("&Help/About", FL_F + 1, cb_about);
-		bar->color(FL_WHITE);
-		bar->selection_color(FL_BLUE);
-		
-		bar->callback([](Fl_Widget* w, void* ud){
-			Fl_Window* win= (Fl_Window*)ud;
-			win->redraw();
-		}, window);
-
-		disp = new RFO(0, 22, 300, 188);
+		disp = new RFO(0, 0, 300, 188);
 		disp->box(FL_PLASTIC_DOWN_BOX);
 		disp->fontsize(200);
 		disp->textcolor((Fl_Color)228);
 		disp->value("??");
 		window->add(disp);
 
-		start = new Fl_Button(190, 269, 86, 30, "Start");
+		start = new Fl_Button(190, 247, 86, 30, "Start");
 		start->callback(startroll,disp);
 		start->box(FL_PLASTIC_UP_BOX);
 		start->down_box(FL_PLASTIC_DOWN_BOX);
 		start->labelfont(1);
 		
 
-		Fl_Check_Button* autostop = new Fl_Check_Button(190, 241, 86, 28, "Auto Stop");
+		Fl_Check_Button* autostop = new Fl_Check_Button(190, 218, 86, 28, "Auto Stop");
 		autostop->down_box(FL_DOWN_BOX);
 		autostop->labelfont(1);
 		autostop->callback([](Fl_Widget* w, void* ud){
@@ -101,15 +87,17 @@ int main(int argc, char **argv) {
 			as = cb->value();
 		}, nullptr);
 
-		Fl_Box* icon = new Fl_Box(0, 220, 180, 100);
-		icon->image( image_icon() );
-		icon->align(Fl_Align(512));
-
-		no = new Fl_Output(200, 210, 120, 32);
+		no = new Fl_Output(0, 188, 180, 60);
 		no->box(FL_THIN_DOWN_BOX);
 		no->textfont(FL_HELVETICA_ITALIC);
-		no->textsize(30);
-		no->parent()->add(no);
+		no->textsize(60);
+
+		Fl_Check_Button* norepeat = new Fl_Check_Button(190, 197, 86, 28, "No Repeat");
+		norepeat->labelfont(1);
+
+		Fl_Box* minimize = new Fl_Box(185, 290, 120, 30, "Hide->█");
+		minimize->labelcolor(FL_BLUE);
+		minimize->labelsize(30);
 	}
 	window->end();
 	window->show(argc, argv);
@@ -161,12 +149,12 @@ void cb_setting(Fl_Widget*, void*) {
 	setting_wnd->set_modal();
 	VI* autostopt = new VI(151, 10, 64, 22, "Auto Stop Time:");
 	autostopt->value(ast);
-	Fl_Button* ok = new Fl_Button(117, 133, 64, 20, "OK");
-	Fl_Button* cancel = new Fl_Button(32, 133, 64, 20, "Cancel");
-	Fl_Button* CheckUPT = new Fl_Button(53, 95, 115, 20, "Check for Update");
-	Fl_Box* rseedb = new Fl_Box(32, 45, 148, 20, "Random Seed");
+	Fl_Button* ok = new Fl_Button(127, 133, 64, 20, "OK");
+	Fl_Button* cancel = new Fl_Button(42, 133, 64, 20, "Cancel");
+	Fl_Button* CheckUPT = new Fl_Button(63, 95, 115, 20, "Check for Update");
+	Fl_Box* rseedb = new Fl_Box(42, 45, 148, 20, "Random Seed");
 	rseedb->labelfont(1);
-	VI* rseed = new VI(32, 65, 148, 22, "");
+	VI* rseed = new VI(42, 65, 148, 22, "");
 	rseed->value(seed);
 
 	rseed->callback(cb_seed_changed);
