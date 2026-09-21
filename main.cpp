@@ -19,7 +19,10 @@
 #include <FL/Fl_Spinner.H>
 #include <FL/Fl_Value_Input.H>
 #include <Fl/fl_ask.H>
+#include <FL/platform.H>
 
+void cb_min(Fl_Widget*, void* ud);
+void cb_showit(Fl_Widget*, void* ud);
 void cb_about(Fl_Widget*, void*);
 void cb_setting(Fl_Widget*, void*);
 void cb_pplsettings(Fl_Widget*, void*);
@@ -48,6 +51,26 @@ bool as=false;
 struct timeb tick;
 int cc;
 vector<int> weightdq;
+bool shown=true;
+
+Fl_Double_Window* window;
+Fl_Double_Window* showit;
+
+void keep_on_top(void*) {
+    HWND hwnd = fl_xid(window);
+    if (hwnd) {
+        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+
+	HWND hwnd2 = fl_xid(showit);
+    if (hwnd2) {
+        SetWindowPos(hwnd2, HWND_TOPMOST, 0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+    // 每 500ms 重新置顶一次
+    Fl::repeat_timeout(0.5, keep_on_top);
+}
 
 int main(int argc, char **argv) {
 	RSAPinit();
@@ -62,7 +85,7 @@ int main(int argc, char **argv) {
 	
 	pool=buildPool(class1);
 	
-	Fl_Double_Window* window = new Fl_Double_Window(300, 320, "RSAP");
+	window = new Fl_Double_Window(300, 320, "RSAP");
 
 	{
 		disp = new RFO(0, 0, 300, 188);
@@ -95,14 +118,39 @@ int main(int argc, char **argv) {
 		Fl_Check_Button* norepeat = new Fl_Check_Button(190, 197, 86, 28, "No Repeat");
 		norepeat->labelfont(1);
 
-		Fl_Box* minimize = new Fl_Box(185, 290, 120, 30, "Hide->█");
+		Fl_Button* minimize = new Fl_Button(220, 290, 80, 30, "Hide");
 		minimize->labelcolor(FL_BLUE);
 		minimize->labelsize(30);
+		minimize->box(FL_FLAT_BOX);
+		minimize->callback(cb_min, nullptr);
+
+		
 	}
 	window->end();
-	window->show(argc, argv);
+	Fl::get_system_colors();
+
+	showit = new Fl_Double_Window(Fl::w(),Fl::h(),36,36,"");
+	showit->set_modal();
+	showit->border(0);
+	Fl_Button* showitbtn = new Fl_Button(0,0,36,36,"Show");
+	showitbtn->box(FL_PLASTIC_UP_BOX);
+	showitbtn->callback(cb_showit, nullptr);
+	showit->end();
+	showit->show();
+	
+    Fl::repeat_timeout(0.5, keep_on_top);
 
 	return Fl::run();
+}
+
+void cb_min(Fl_Widget*, void* ud) {
+	window->hide();
+	showit->show();
+}
+
+void cb_showit(Fl_Widget*, void* ud){
+	showit->hide();
+	window->show();
 }
 
 void cb_about(Fl_Widget*, void*) {
