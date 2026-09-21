@@ -5,7 +5,7 @@ code_name {.cxx}
 Function {pplsettings()} {open
 } {
   Fl_Window {} {
-    label {People Settings} open selected
+    label {People Settings} open
     xywh {718 192 381 168} type Double hide
   } {
     Fl_Group {} {
@@ -49,6 +49,31 @@ Function {pplsettings()} {open
         label {New name:}
         xywh {280 63 64 22}
       }
+    }
+  }
+}
+
+Function {morewnd()} {open
+} {
+  Fl_Window {} {open selected
+    xywh {444 296 220 330} type Double hide
+  } {
+    Fl_Group {} {
+      label Settings open
+      xywh {0 15 220 92} box SHADOW_FRAME labelfont 1
+    } {
+      Fl_Button {} {
+        label General
+        xywh {10 25 58 28} box PLASTIC_UP_BOX
+      }
+      Fl_Button {} {
+        label Person
+        xywh {10 69 58 28} box PLASTIC_UP_BOX
+      }
+    }
+    Fl_Button {} {
+      label About
+      xywh {141 293 64 22} box PLASTIC_UP_BOX
     }
   }
 }
