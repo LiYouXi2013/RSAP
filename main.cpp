@@ -63,7 +63,7 @@ void keep_on_top(void*) {
                      SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
     }
 
-	HWND hwnd2 = fl_xid(showit);
+    HWND hwnd2 = fl_xid(showit);
     if (hwnd2) {
         SetWindowPos(hwnd2, HWND_TOPMOST, 0, 0, 0, 0,
                      SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
