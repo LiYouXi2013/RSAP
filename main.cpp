@@ -30,8 +30,10 @@ void cb_pplsettings(Fl_Widget*, void*);
 void cb_setting_ok(Fl_Widget*, void* ud);
 void cb_seed_changed(Fl_Widget* w, void*);
 void cb_ast_changed(Fl_Widget* w, void*);
-void cb_search(Fl_Widget*, void*);
-void cb_apply(Fl_Widget*, void*);
+void cb_w_search(Fl_Widget*, void*);
+void cb_w_apply(Fl_Widget*, void*);
+void cb_n_search(Fl_Widget*, void*);
+void cb_n_apply(Fl_Widget*, void*);
 
 void startroll(Fl_Widget*, void* a);
 void RSAPinit();
@@ -235,9 +237,6 @@ void cb_about(Fl_Widget*, void*)
 
 }
 
-Fl_Spinner *spinner;
-VI *novi;
-
 void cb_setting(Fl_Widget*, void*)
 {
     Fl_Window* setting_wnd = new Fl_Window(235, 167, "Settings");
@@ -267,24 +266,47 @@ void cb_setting(Fl_Widget*, void*)
     while (setting_wnd->shown()) Fl::wait();
 }
 
+VI *spinner;
+VI *novi;
+Fl_Input*spinner2;
+VI *novi2;
+
 void cb_pplsettings(Fl_Widget*, void*)
 {
     Fl_Window* setting_wnd = new Fl_Window(381, 185, "Settings");
     setting_wnd->set_modal();
     Fl_Group* CAGrp = new Fl_Group(0, 15, 190, 152, "Chance Adjuster");
     CAGrp->box(FL_SHADOW_FRAME);
-    spinner = new Fl_Spinner(90, 63, 64, 22, "Weight:");
+    spinner = new VI(90, 63, 64, 22, "Weight:");
     novi = new VI(90, 33, 64, 22, "No.:");
     Fl_Button* search = new Fl_Button(90, 93, 64, 24, "Search");
     Fl_Button* apply = new Fl_Button(90, 125, 64, 24, "Apply");
     CAGrp->labelfont(1);
     CAGrp->end();
 
-    search->callback(cb_search);
-    apply->callback(cb_apply);
+    Fl_Group* NAGrp = new Fl_Group(191, 15, 190, 152, "Name");
+    NAGrp->box(FL_SHADOW_FRAME);
+    spinner2 = new Fl_Input(281, 63, 64, 22, "Name:");
+    novi2 = new VI(281, 33, 64, 22, "No.:");
+    Fl_Button* search2 = new Fl_Button(281, 93, 64, 24, "Search");
+    Fl_Button* apply2 = new Fl_Button(281, 125, 64, 24, "Apply");
+    NAGrp->labelfont(1);
+    NAGrp->end();
 
-    Fl_Button* ok = new Fl_Button(127, 165, 64, 20, "OK");
+    search->callback(cb_w_search);
+    apply->callback(cb_w_apply);
+
+    search2->callback(cb_n_search);
+    apply2->callback(cb_n_apply);
+
+    Fl_Button* ok = new Fl_Button(270, 165, 64, 20, "OK");
     Fl_Button* cancel = new Fl_Button(42, 165, 64, 20, "Cancel");
+
+    ok->callback(cb_setting_ok, setting_wnd);
+    cancel->callback([](Fl_Widget * w, void* ud) {
+        ((Fl_Window*)ud)->hide();
+    }, setting_wnd);
+
 
     setting_wnd->end();
     setting_wnd->show();
@@ -294,6 +316,10 @@ void cb_pplsettings(Fl_Widget*, void*)
 void cb_setting_ok(Fl_Widget*, void* ud)
 {
     RSAPsave();
+    cout<<endl;
+    for(Person i:class1){
+        cout<<i.name<<":"<<i.weight<<endl;
+    }
     cout << "saved" << endl;
     ((Fl_Window*)ud)->hide();
 }
@@ -315,7 +341,7 @@ void cb_ast_changed(Fl_Widget* w, void*)
     ast = (uint32_t)vi->value();
 }
 
-void cb_search(Fl_Widget*, void*)
+void cb_w_search(Fl_Widget*, void*)
 {
     int no = (int)novi->value();
     if (no < 1 || no > class1.size()) {
@@ -326,17 +352,46 @@ void cb_search(Fl_Widget*, void*)
     spinner->value(class1[no - 1].weight);
 }
 
-void cb_apply(Fl_Widget*, void*)
+void cb_w_apply(Fl_Widget*, void*)
 {
     int no = (int)novi->value();
-    if (no < 1 || no > class1.size() || spinner->value() < 0) {
-        fl_alert("Invalid input!");
+    if (no < 1 ||no > class1.size() ||spinner->value() < 0) {
+        fl_alert("Invalid input!\nYou can add a new person in \"Name Setting\".");
         return;
     }
 
     class1[no - 1].weight = (int)spinner->value();
     pool = buildPool(class1);
+    cout<<"Weight:"<<spinner->value()<<endl;
     fl_message("Weight of No.%d has been changed to %d.", no, class1[no - 1].weight);
+}
+
+void cb_n_search(Fl_Widget*, void*){
+    int no = (int)novi2->value();
+    if (no < 1 || no > class1.size()) {
+        spinner2->value("无名氏");
+        return;
+    }
+
+    spinner2->value(class1[no - 1].name.c_str());
+}
+
+void cb_n_apply(Fl_Widget*, void*){
+    int no = (int)novi2->value();
+    if (no < 1) {
+        fl_alert("Invalid input!");
+        return;
+    }
+    if(no>class1.size()){
+        no=class1.size()+1;
+        novi2->value(no);
+        class1.push_back({spinner2->value(),1});
+    }else{
+        class1[no - 1].name = (string)spinner2->value();
+    }
+    pool = buildPool(class1);
+    cout<<"Name:"<<spinner2->value()<<endl;
+    fl_message("Name of No.%d has been changed to %s.", no, class1[no - 1].name.c_str());
 }
 
 bool is_rolling = false;

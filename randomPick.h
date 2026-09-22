@@ -7,7 +7,7 @@ using namespace std;
 static mt19937 gen(0);
 
 struct Person {
-	string name = "";
+	string name = "无名氏";
 	int weight = 1;
 };
 
