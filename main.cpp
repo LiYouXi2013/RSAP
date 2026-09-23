@@ -1,3 +1,21 @@
+/*
+RSAP
+Copyright (C) 2026 LiYouXi2013, Candyman_RDFZ
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "randomPick.h"
 #include "readInt.h"
 #include "customWidgets.h"
@@ -21,6 +39,10 @@
 #include <Fl/fl_ask.H>
 #include <FL/platform.H>
 
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
+
 void cb_min(Fl_Widget*, void* ud);
 void cb_showit(Fl_Widget*, void* ud);
 void cb_more(Fl_Widget*, void*);
@@ -38,6 +60,7 @@ void cb_n_apply(Fl_Widget*, void*);
 void startroll(Fl_Widget*, void* a);
 void RSAPinit();
 void RSAPsave();
+void SpdLogInit();
 
 using namespace std;
 
@@ -78,15 +101,14 @@ void keep_on_top(void*)
 
 int main(int argc, char **argv)
 {
+    SpdLogInit();
+    spdlog::info("SpdLog Inited");
     RSAPinit();
-    putenv("FLTK_GDIPLUS=0");
-    HWND hwnd = FindWindowA(NULL, "RSAP"); cout << "HWND" << hwnd << endl;
-    SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE);
+    spdlog::info("Configurations read");
 
     Fl::set_font(FL_HELVETICA, "Consolas");
     Fl::set_font(FL_HELVETICA_BOLD, "BConsolas");
     Fl::set_font(FL_HELVETICA_ITALIC, "Huiwen-Fangsong");
-    cout << seed << endl;
 
     pool = buildPool(class1);
 
@@ -153,14 +175,79 @@ int main(int argc, char **argv)
     return Fl::run();
 }
 
+void RSAPinit()
+{
+    seed = GetPrivateProfileIntA("General", "Seed", 0, "./settings.ini");
+    ast = GetPrivateProfileIntA("General", "AST", 0, "./settings.ini");
+
+    char t1[65536];
+    GetPrivateProfileStringA("General", "Weight", "冯心仪-1,胡熙冉-1,李景仪-1,齐泽雨-1,田依暄-1,王锦璠-1,王逸舟-1,谢卓妍-1,邢与庭-1,鄢紫羲-1,袁家怡-1,战清欢-1,赵骐萱-1,周雨泉-1,邹佳晨-1,安昱-1,李尚-1,郭佳诺-1,韩津桐-1,胡煜橦-1,黄之尧-1,纪千豪-1,李宥羲-1,李宇新-1,李宗泽-1,马悠然-1,孙一硕-1,唐启轩-1,田雨瑞-1,胥林昊-1,张嘉宸-1,张嘉彧-1,赵康迪-1,赵天予-1,赵奕茗-1,赵逸和-1,郑博睿-1,郑峻宇-0,周泓予-1,周雨辰-1,孙奕萱-1", t1, sizeof(t1), "./settings.ini");
+    string t_str = t1;
+    class1 = readInt(t_str);
+
+    for (Person i : class1) {
+        spdlog::debug("Name: {} Weight: {}", i.name, i.weight);
+    }
+
+    if (seed == 0) {
+        static std::random_device rd;
+        seed = rd();
+        isdef = true;
+        spdlog::debug("Used Def Seed");
+    }
+    spdlog::info("Seed: {}", seed);
+    gen.seed(seed);
+
+    spdlog::info("Inited settings");
+}
+
+void RSAPsave()
+{
+    if (isdef) {
+        WritePrivateProfileStringA("General", "Seed", to_string(0).c_str(), "./settings.ini");
+        spdlog::debug("Used Def Seed");
+    } else {
+        WritePrivateProfileStringA("General", "Seed", to_string(seed).c_str(), "./settings.ini");
+    }
+    if (seed == 0) {
+        static std::random_device rd;
+        seed = rd();
+    }
+    spdlog::info("Seed: {}", seed);
+    gen.seed(seed);
+    spdlog::info("Seed writen into settings.ini");
+
+    WritePrivateProfileStringA("General", "AST", to_string(ast).c_str(), "./settings.ini");
+    WritePrivateProfileStringA("General", "Weight", join(class1).c_str(), "./settings.ini");
+    spdlog::info("All settings saved");
+}
+
+void SpdLogInit()
+{
+    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("rsap.log", true);
+
+    console_sink->set_level(spdlog::level::debug);
+    file_sink->set_level(spdlog::level::info); // 文件只保存info及以上
+
+    // 2. 合并sink，生成logger
+    std::vector<spdlog::sink_ptr> sinks{console_sink, file_sink};
+    auto logger = std::make_shared<spdlog::logger>("RSAP", sinks.begin(), sinks.end());
+    logger->set_pattern("%Y-%m-%d %H:%M:%S [%n/%^%l%$] %v");
+    spdlog::register_logger(logger);
+    spdlog::set_default_logger(logger);
+}
+
 void cb_min(Fl_Widget*, void* ud)
 {
+    spdlog::debug("Main->Float");
     window->hide();
     showit->show();
 }
 
 void cb_showit(Fl_Widget*, void* ud)
 {
+    spdlog::debug("Float->Main");
     showit->hide();
     window->show();
 }
@@ -268,7 +355,7 @@ void cb_setting(Fl_Widget*, void*)
 
 VI *spinner;
 VI *novi;
-Fl_Input*spinner2;
+Fl_Input *spinner2;
 VI *novi2;
 
 void cb_pplsettings(Fl_Widget*, void*)
@@ -316,27 +403,19 @@ void cb_pplsettings(Fl_Widget*, void*)
 void cb_setting_ok(Fl_Widget*, void* ud)
 {
     RSAPsave();
-    cout<<endl;
-    for(Person i:class1){
-        cout<<i.name<<":"<<i.weight<<endl;
-    }
-    cout << "saved" << endl;
     ((Fl_Window*)ud)->hide();
 }
 
 void cb_seed_changed(Fl_Widget* w, void*)
 {
-    cout << "cb_seed_changed" << endl;
     VI* vi = (VI*)w;
     seed = (uint32_t)vi->value();
     isdef = false;
     if (seed == 0)isdef = true;
-    cout << "Seed changed to " << seed << endl;
 }
 
 void cb_ast_changed(Fl_Widget* w, void*)
 {
-    cout << "cb_ast_changed" << endl;
     VI* vi = (VI*)w;
     ast = (uint32_t)vi->value();
 }
@@ -355,18 +434,19 @@ void cb_w_search(Fl_Widget*, void*)
 void cb_w_apply(Fl_Widget*, void*)
 {
     int no = (int)novi->value();
-    if (no < 1 ||no > class1.size() ||spinner->value() < 0) {
+    if (no < 1 || no > class1.size() || spinner->value() < 0) {
         fl_alert("Invalid input!\nYou can add a new person in \"Name Setting\".");
         return;
     }
 
     class1[no - 1].weight = (int)spinner->value();
     pool = buildPool(class1);
-    cout<<"Weight:"<<spinner->value()<<endl;
+    cout << "Weight:" << spinner->value() << endl;
     fl_message("Weight of No.%d has been changed to %d.", no, class1[no - 1].weight);
 }
 
-void cb_n_search(Fl_Widget*, void*){
+void cb_n_search(Fl_Widget*, void*)
+{
     int no = (int)novi2->value();
     if (no < 1 || no > class1.size()) {
         spinner2->value("无名氏");
@@ -376,21 +456,21 @@ void cb_n_search(Fl_Widget*, void*){
     spinner2->value(class1[no - 1].name.c_str());
 }
 
-void cb_n_apply(Fl_Widget*, void*){
+void cb_n_apply(Fl_Widget*, void*)
+{
     int no = (int)novi2->value();
     if (no < 1) {
         fl_alert("Invalid input!");
         return;
     }
-    if(no>class1.size()){
-        no=class1.size()+1;
+    if (no > class1.size()) {
+        no = class1.size() + 1;
         novi2->value(no);
-        class1.push_back({spinner2->value(),1});
-    }else{
+        class1.push_back({spinner2->value(), 1});
+    } else {
         class1[no - 1].name = (string)spinner2->value();
     }
     pool = buildPool(class1);
-    cout<<"Name:"<<spinner2->value()<<endl;
     fl_message("Name of No.%d has been changed to %s.", no, class1[no - 1].name.c_str());
 }
 
@@ -421,7 +501,6 @@ void startroll(Fl_Widget*, void* a)
         start->copy_label("Start");
         return;
     }
-    cout << "AS:" << as << endl;
     if (!as) {
         int ii = randomPick(pool);
         disp->value(to_string(ii + 1).c_str());
@@ -433,48 +512,3 @@ void startroll(Fl_Widget*, void* a)
         Fl::add_timeout(0, do_a_roll);
     }
 }
-
-void RSAPinit()
-{
-    seed = GetPrivateProfileIntA("General", "Seed", 0, "./settings.ini");
-    ast = GetPrivateProfileIntA("General", "AST", 0, "./settings.ini");
-
-    char t1[65536];
-    GetPrivateProfileStringA("General", "Weight", "冯心仪-1,胡熙冉-1,李景仪-1,齐泽雨-1,田依暄-1,王锦璠-1,王逸舟-1,谢卓妍-1,邢与庭-1,鄢紫羲-1,袁家怡-1,战清欢-1,赵骐萱-1,周雨泉-1,邹佳晨-1,安昱-1,李尚-1,郭佳诺-1,韩津桐-1,胡煜橦-1,黄之尧-1,纪千豪-1,李宥羲-1,李宇新-1,李宗泽-1,马悠然-1,孙一硕-1,唐启轩-1,田雨瑞-1,胥林昊-1,张嘉宸-1,张嘉彧-1,赵康迪-1,赵天予-1,赵奕茗-1,赵逸和-1,郑博睿-1,郑峻宇-0,周泓予-1,周雨辰-1,孙奕萱-1", t1, sizeof(t1), "./settings.ini");
-    string t_str = t1;
-    class1 = readInt(t_str);
-
-    for (int i : weightdq) {
-        class1.push_back((Person) {
-            "", i
-        });
-    }
-
-    if (seed == 0) {
-        static std::random_device rd;
-        seed = rd();
-        isdef = true;
-    }
-    gen.seed(seed);
-}
-
-void RSAPsave()
-{
-    cout << seed << endl;
-    if (isdef) {
-        WritePrivateProfileStringA("General", "Seed", to_string(0).c_str(), "./settings.ini");
-        cout << "used def ";
-    } else {
-        WritePrivateProfileStringA("General", "Seed", to_string(seed).c_str(), "./settings.ini");
-    }
-    if (seed == 0) {
-        static std::random_device rd;
-        seed = rd();
-        cout << "rd seed:" << seed << endl;
-    }
-    gen.seed(seed);
-
-    WritePrivateProfileStringA("General", "AST", to_string(ast).c_str(), "./settings.ini");
-    WritePrivateProfileStringA("General", "Weight", join(class1).c_str(), "./settings.ini");
-}
-
