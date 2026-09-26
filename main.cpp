@@ -181,7 +181,7 @@ void RSAPinit()
     ast = GetPrivateProfileIntA("General", "AST", 0, "./settings.ini");
 
     char t1[65536];
-    GetPrivateProfileStringA("General", "Weight", "冯心仪-1,胡熙冉-1,李景仪-1,齐泽雨-1,田依暄-1,王锦璠-1,王逸舟-1,谢卓妍-1,邢与庭-1,鄢紫羲-1,袁家怡-1,战清欢-1,赵骐萱-1,周雨泉-1,邹佳晨-1,安昱-1,李尚-1,郭佳诺-1,韩津桐-1,胡煜橦-1,黄之尧-1,纪千豪-1,李宥羲-1,李宇新-1,李宗泽-1,马悠然-1,孙一硕-1,唐启轩-1,田雨瑞-1,胥林昊-1,张嘉宸-1,张嘉彧-1,赵康迪-1,赵天予-1,赵奕茗-1,赵逸和-1,郑博睿-1,郑峻宇-0,周泓予-1,周雨辰-1,孙奕萱-1", t1, sizeof(t1), "./settings.ini");
+    GetPrivateProfileStringA("General", "Weight", "TESTNAME-1", t1, sizeof(t1), "./settings.ini");
     string t_str = t1;
     class1 = readInt(t_str);
 
@@ -374,6 +374,7 @@ void cb_pplsettings(Fl_Widget*, void*)
     Fl_Group* NAGrp = new Fl_Group(191, 15, 190, 152, "Name");
     NAGrp->box(FL_SHADOW_FRAME);
     spinner2 = new Fl_Input(281, 63, 64, 22, "Name:");
+    spinner2->value("无名氏");
     novi2 = new VI(281, 33, 64, 22, "No.:");
     Fl_Button* search2 = new Fl_Button(281, 93, 64, 24, "Search");
     Fl_Button* apply2 = new Fl_Button(281, 125, 64, 24, "Apply");
