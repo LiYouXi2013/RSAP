@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "randomPick.h"
 #include "readInt.h"
 #include "customWidgets.h"
+#include "updateChecker.h"
 #include <windows.h>
 #include <iostream>
 #include <string.h>
@@ -112,7 +113,7 @@ int main(int argc, char **argv)
 
     pool = buildPool(class1);
 
-    window = new Fl_Double_Window(300, 320, "RSAP");
+    window = new Fl_Double_Window(Fl::w()-400, Fl::h()-420, 300, 320, "RSAP");
 
     {
         disp = new RFO(0, 0, 300, 188);
@@ -161,6 +162,8 @@ int main(int argc, char **argv)
     window->show();
     Fl::get_system_colors();
 
+    Fl::lock();
+
     showit = new Fl_Double_Window(Fl::w(), Fl::h(), 36, 36, "");
     showit->set_modal();
     showit->border(0);
@@ -172,7 +175,8 @@ int main(int argc, char **argv)
 
     Fl::repeat_timeout(0.5, keep_on_top);
 
-    return Fl::run();
+    Fl::run();
+    return 0;
 }
 
 void RSAPinit()
@@ -238,9 +242,13 @@ void SpdLogInit()
     spdlog::set_default_logger(logger);
 }
 
+int x,y;
+
 void cb_min(Fl_Widget*, void* ud)
 {
     spdlog::debug("Main->Float");
+    x=window->x();
+    y=window->y();
     window->hide();
     showit->show();
 }
@@ -248,6 +256,7 @@ void cb_min(Fl_Widget*, void* ud)
 void cb_showit(Fl_Widget*, void* ud)
 {
     spdlog::debug("Float->Main");
+    window->position(x,y);
     showit->hide();
     window->show();
 }
@@ -255,7 +264,7 @@ void cb_showit(Fl_Widget*, void* ud)
 void cb_more(Fl_Widget*, void*)
 {
     Fl::remove_timeout(keep_on_top);
-    Fl_Double_Window* morewnd = new Fl_Double_Window(220, 330);
+    Fl_Double_Window* morewnd = new Fl_Double_Window(window->x()-100,window->y()-100, 220, 330);
     morewnd->set_modal();
 
     Fl_Group* settiings = new Fl_Group(0, 15, 220, 92, "Settings");
@@ -289,7 +298,7 @@ void cb_more(Fl_Widget*, void*)
 
 void cb_about(Fl_Widget*, void*)
 {
-    Fl_Window dlg(360, 240, "About");
+    Fl_Window dlg(window->x()-100,window->y()-100,360, 240, "About");
     dlg.set_modal(); // 模态，阻塞父窗口
 
     // 标题文字
@@ -324,15 +333,38 @@ void cb_about(Fl_Widget*, void*)
 
 }
 
+Fl_Button* CheckUPT;
+
+void cb_checkUPT(Fl_Widget* sf,void*){
+    CheckUPT->label("Checking...");
+    std::thread t = thread(cb_bkcheckUPT);
+    t.detach();
+}
+
+void cb_okcheckUPT(void*){
+    if(!uptinfo.newer){
+        fl_message("All Up To Date!");
+    }else{
+        if(fl_ask("Found a newer version: %d \n " \
+            "Would you like to open the release page? \n" \
+            "  Password: 1234",uptinfo.remoteVer)){
+                system("start https://lyx201312.lanzouu.com/b00wnw20ri");
+            }
+
+    }
+
+    CheckUPT->label("Check For Update");
+}
+
 void cb_setting(Fl_Widget*, void*)
 {
-    Fl_Window* setting_wnd = new Fl_Window(235, 167, "Settings");
+    Fl_Window* setting_wnd = new Fl_Window(window->x()-100,window->y()-100, 235, 167, "Settings");
     setting_wnd->set_modal();
     VI* autostopt = new VI(151, 10, 64, 22, "Auto Stop Time:");
     autostopt->value(ast);
     Fl_Button* ok = new Fl_Button(127, 133, 64, 20, "OK");
     Fl_Button* cancel = new Fl_Button(42, 133, 64, 20, "Cancel");
-    Fl_Button* CheckUPT = new Fl_Button(63, 95, 115, 20, "Check for Update");
+    CheckUPT = new Fl_Button(43, 95, 155, 20, "Check for Update");
     Fl_Box* rseedb = new Fl_Box(42, 45, 148, 20, "Random Seed");
     rseedb->labelfont(1);
     VI* rseed = new VI(42, 65, 148, 22, "");
@@ -340,6 +372,7 @@ void cb_setting(Fl_Widget*, void*)
 
     rseed->callback(cb_seed_changed);
     autostopt->callback(cb_ast_changed);
+    CheckUPT->callback(cb_checkUPT);
 
     cancel->callback([](Fl_Widget * w, void* ud) {
         ((Fl_Window*)ud)->hide();
@@ -360,7 +393,7 @@ VI *novi2;
 
 void cb_pplsettings(Fl_Widget*, void*)
 {
-    Fl_Window* setting_wnd = new Fl_Window(381, 185, "Settings");
+    Fl_Window* setting_wnd = new Fl_Window(window->x()-100,window->y()-100, 381, 185, "Settings");
     setting_wnd->set_modal();
     Fl_Group* CAGrp = new Fl_Group(0, 15, 190, 152, "Chance Adjuster");
     CAGrp->box(FL_SHADOW_FRAME);
