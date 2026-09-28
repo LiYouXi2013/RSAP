@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 
     pool = buildPool(class1);
 
-    window = new Fl_Double_Window(Fl::w()-400, Fl::h()-420, 300, 320, "RSAP");
+    window = new Fl_Double_Window(Fl::w() - 400, Fl::h() - 420, 300, 320, "RSAP");
 
     {
         disp = new RFO(0, 0, 300, 188);
@@ -242,13 +242,13 @@ void SpdLogInit()
     spdlog::set_default_logger(logger);
 }
 
-int x,y;
+int x, y;
 
 void cb_min(Fl_Widget*, void* ud)
 {
     spdlog::debug("Main->Float");
-    x=window->x();
-    y=window->y();
+    x = window->x();
+    y = window->y();
     window->hide();
     showit->show();
 }
@@ -256,7 +256,7 @@ void cb_min(Fl_Widget*, void* ud)
 void cb_showit(Fl_Widget*, void* ud)
 {
     spdlog::debug("Float->Main");
-    window->position(x,y);
+    window->position(x, y);
     showit->hide();
     window->show();
 }
@@ -264,7 +264,7 @@ void cb_showit(Fl_Widget*, void* ud)
 void cb_more(Fl_Widget*, void*)
 {
     Fl::remove_timeout(keep_on_top);
-    Fl_Double_Window* morewnd = new Fl_Double_Window(window->x()-100,window->y()-100, 220, 330);
+    Fl_Double_Window* morewnd = new Fl_Double_Window(window->x() - 100, window->y() - 100, 220, 330);
     morewnd->set_modal();
 
     Fl_Group* settiings = new Fl_Group(0, 15, 220, 92, "Settings");
@@ -298,7 +298,7 @@ void cb_more(Fl_Widget*, void*)
 
 void cb_about(Fl_Widget*, void*)
 {
-    Fl_Window dlg(window->x()-100,window->y()-100,360, 240, "About");
+    Fl_Window dlg(window->x() - 100, window->y() - 100, 360, 240, "About");
     dlg.set_modal(); // 模态，阻塞父窗口
 
     // 标题文字
@@ -333,32 +333,40 @@ void cb_about(Fl_Widget*, void*)
 
 }
 
-Fl_Button* CheckUPT;
+Fl_Button *CheckUPT;
+bool doing = false;
 
-void cb_checkUPT(Fl_Widget* sf,void*){
+void cb_checkUPT(Fl_Widget* sf, void*)
+{
+    if (doing) {
+        fl_message("Already Checking!");
+    }
     CheckUPT->label("Checking...");
     std::thread t = thread(cb_bkcheckUPT);
     t.detach();
+    doing = true;
 }
 
-void cb_okcheckUPT(void*){
-    if(!uptinfo.newer){
+void cb_okcheckUPT(void*)
+{
+    if (!uptinfo.newer) {
         fl_message("All Up To Date!");
-    }else{
-        if(fl_ask("Found a newer version: %d \n " \
-            "Would you like to open the release page? \n" \
-            "  Password: 1234",uptinfo.remoteVer)){
-                system("start https://lyx201312.lanzouu.com/b00wnw20ri");
-            }
+    } else {
+        if (fl_ask("Found a newer version: %d \n " \
+                   "Would you like to open the release page? \n" \
+                   "  Password: 1234", uptinfo.remoteVer)) {
+            system("start https://lyx201312.lanzouu.com/b00wnw20ri");
+        }
 
     }
 
     CheckUPT->label("Check For Update");
+    doing = false;
 }
 
 void cb_setting(Fl_Widget*, void*)
 {
-    Fl_Window* setting_wnd = new Fl_Window(window->x()-100,window->y()-100, 235, 167, "Settings");
+    Fl_Window* setting_wnd = new Fl_Window(window->x() - 100, window->y() - 100, 235, 167, "Settings");
     setting_wnd->set_modal();
     VI* autostopt = new VI(151, 10, 64, 22, "Auto Stop Time:");
     autostopt->value(ast);
@@ -393,7 +401,7 @@ VI *novi2;
 
 void cb_pplsettings(Fl_Widget*, void*)
 {
-    Fl_Window* setting_wnd = new Fl_Window(window->x()-100,window->y()-100, 381, 185, "Settings");
+    Fl_Window* setting_wnd = new Fl_Window(window->x() - 100, window->y() - 100, 381, 185, "Settings");
     setting_wnd->set_modal();
     Fl_Group* CAGrp = new Fl_Group(0, 15, 190, 152, "Chance Adjuster");
     CAGrp->box(FL_SHADOW_FRAME);
