@@ -10,7 +10,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <FL/Fl.H>
 
-const unsigned long long localVersion = 2;
+const unsigned long long localVersion = 4;
 
 void cb_okcheckUPT(void*);
 
@@ -238,7 +238,7 @@ void cb_bkcheckUPT()
         } else {
             spdlog::warn("HTTP GET returned empty body, no Error");
         }
-        uptinfo.ok=false;
+        uptinfo.ok = false;
         Fl::awake(cb_okcheckUPT);
         return;
     }
