@@ -10,9 +10,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <FL/Fl.H>
 
-#pragma comment(lib, "winhttp.lib")
-
-unsigned long long localVersion = 2;
+const unsigned long long localVersion = 2;
 
 void cb_okcheckUPT(void*);
 
