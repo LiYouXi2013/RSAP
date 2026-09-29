@@ -66,7 +66,6 @@ void SpdLogInit();
 using namespace std;
 
 personVec class1;
-poolVec pool;
 uint32_t seed;
 double ast;
 bool isdef = false;
@@ -111,7 +110,7 @@ int main(int argc, char **argv)
     Fl::set_font(FL_HELVETICA_BOLD, "BConsolas");
     Fl::set_font(FL_HELVETICA_ITALIC, "Huiwen-Fangsong");
 
-    pool = buildPool(class1);
+    buildPool(class1);
 
     window = new Fl_Double_Window(Fl::w() - 400, Fl::h() - 420, 300, 320, "RSAP");
 
@@ -145,6 +144,10 @@ int main(int argc, char **argv)
 
         Fl_Check_Button* norepeat = new Fl_Check_Button(190, 197, 86, 28, "No Repeat");
         norepeat->labelfont(1);
+        norepeat->callback([](Fl_Widget * w, void*) {
+            Fl_Check_Button* w2 = (Fl_Check_Button*)w;
+            is_norepeat = w2->value();
+        });
 
         Fl_Button* minimize = new Fl_Button(220, 290, 80, 30, "Hide");
         minimize->labelcolor(FL_BLUE);
@@ -350,7 +353,7 @@ void cb_checkUPT(Fl_Widget* sf, void*)
 
 void cb_okcheckUPT(void*)
 {
-    if (!uptinfo.ok){
+    if (!uptinfo.ok) {
         fl_message("Cannot check update!\nMet an error!");
         doing = true;
         return;
@@ -488,7 +491,7 @@ void cb_w_apply(Fl_Widget*, void*)
     }
 
     class1[no - 1].weight = (int)spinner->value();
-    pool = buildPool(class1);
+    buildPool(class1);
     cout << "Weight:" << spinner->value() << endl;
     fl_message("Weight of No.%d has been changed to %d.", no, class1[no - 1].weight);
 }
@@ -518,7 +521,7 @@ void cb_n_apply(Fl_Widget*, void*)
     } else {
         class1[no - 1].name = (string)spinner2->value();
     }
-    pool = buildPool(class1);
+    buildPool(class1);
     fl_message("Name of No.%d has been changed to %s.", no, class1[no - 1].name.c_str());
 }
 
@@ -527,7 +530,7 @@ bool is_rolling = false;
 void do_a_roll(void* data)
 {
     is_rolling = true;
-    int ii = randomPick(pool);
+    int ii = randomPick();
     disp->value(to_string(ii + 1).c_str());
     no->value(class1[ii].name.c_str());
     no->redraw();
@@ -550,7 +553,7 @@ void startroll(Fl_Widget*, void* a)
         return;
     }
     if (!as) {
-        int ii = randomPick(pool);
+        int ii = randomPick();
         disp->value(to_string(ii + 1).c_str());
         no->value(class1[ii].name.c_str());
         no->redraw();

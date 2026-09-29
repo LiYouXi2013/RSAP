@@ -68,8 +68,6 @@ public:
         fl_color(textcolor());
 
         fl_draw(txt, drawX, drawY);
-        puts(txt);
-        puts("OK");
     }
 
 protected:
