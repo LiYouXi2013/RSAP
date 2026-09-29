@@ -340,6 +340,7 @@ void cb_checkUPT(Fl_Widget* sf, void*)
 {
     if (doing) {
         fl_message("Already Checking!");
+        return;
     }
     CheckUPT->label("Checking...");
     std::thread t = thread(cb_bkcheckUPT);
@@ -349,6 +350,11 @@ void cb_checkUPT(Fl_Widget* sf, void*)
 
 void cb_okcheckUPT(void*)
 {
+    if (!uptinfo.ok){
+        fl_message("Cannot check update!\nMet an error!");
+        doing = true;
+        return;
+    }
     if (!uptinfo.newer) {
         fl_message("All Up To Date!");
     } else {

@@ -18,15 +18,15 @@ void cb_okcheckUPT(void*);
 static const char *winhttpErrText(DWORD err)
 {
     switch (err) {
-        case 12002: return "ERROR_WINHTTP_TIMEOUT (超时)";
-        case 12007: return "ERROR_WINHTTP_NAME_NOT_RESOLVED (域名解析失败)";
-        case 12029: return "ERROR_WINHTTP_CANNOT_CONNECT (无法连接)";
-        case 12030: return "ERROR_WINHTTP_CONNECTION_ERROR (连接被中止)";
-        case 12152: return "ERROR_WINHTTP_INVALID_SERVER_RESPONSE (服务器响应无效)";
-        case 12175: return "ERROR_WINHTTP_SECURE_FAILURE (SSL/TLS 握手失败)";
-        case 12181: return "ERROR_WINHTTP_INVALID_URL (URL 无效)";
-        case 87:    return "ERROR_INVALID_PARAMETER (参数无效)";
-        default:    return "未知错误";
+        case 12002: return "ERROR_WINHTTP_TIMEOUT";
+        case 12007: return "ERROR_WINHTTP_NAME_NOT_RESOLVED";
+        case 12029: return "ERROR_WINHTTP_CANNOT_CONNECT";
+        case 12030: return "ERROR_WINHTTP_CONNECTION_ERROR";
+        case 12152: return "ERROR_WINHTTP_INVALID_SERVER_RESPONSE";
+        case 12175: return "ERROR_WINHTTP_SECURE_FAILURE";
+        case 12181: return "ERROR_WINHTTP_INVALID_URL";
+        case 87:    return "ERROR_INVALID_PARAMETER";
+        default:    return "Unknown Error";
     }
 }
 
@@ -158,7 +158,7 @@ std::string httpGet(const std::wstring& host, const std::wstring& path,
         // 成功且 body 非空
         if (ok && !body.empty()) {
             if (attempt > 1) {
-                spdlog::info("HTTP GET 成功（第 {} 次尝试）", attempt);
+                spdlog::info("HTTP GET successed ({})", attempt);
             }
             errorCode = 0;
             return body;
@@ -166,7 +166,7 @@ std::string httpGet(const std::wstring& host, const std::wstring& path,
 
         // 服务器正常返回但内容为空：不重试
         if (ok && body.empty()) {
-            spdlog::warn("HTTP GET 成功但 body 为空（服务器返回空内容）");
+            spdlog::warn("Server returned empty string");
             errorCode = 0;
             return body;
         }
@@ -174,18 +174,18 @@ std::string httpGet(const std::wstring& host, const std::wstring& path,
         // 失败：判断是否值得重试
         errorCode = err;
         if (!isRetryable(err)) {
-            spdlog::error("HTTP GET 遇到不可重试错误，code={} ({})",
+            spdlog::error("Unretryable Error! code={} ({})",
                           err, winhttpErrText(err));
             return result;
         }
 
         if (attempt < maxRetries) {
             int delayMs = 1000 * (1 << (attempt - 1)); // 1s,2s,4s,8s,16s
-            spdlog::warn("HTTP GET 第 {}/{} 次失败，code={} ({}), {} ms 后重试",
+            spdlog::warn("HTTP GET FAILED {}/{}, code={} ({}), will retry after {} ms",
                          attempt, maxRetries, err, winhttpErrText(err), delayMs);
             std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
         } else {
-            spdlog::error("HTTP GET 重试 {} 次后仍失败，最后错误码 code={} ({})",
+            spdlog::error("HTTP GET FAILED after {} attempts, code={} ({})",
                           maxRetries, err, winhttpErrText(err));
         }
     }
@@ -219,6 +219,7 @@ struct UPTInfo {
     unsigned long long localVer;
     unsigned long long remoteVer;
     bool newer = true;
+    bool ok = true;
 } uptinfo;
 
 // ============================================================
@@ -232,11 +233,12 @@ void cb_bkcheckUPT()
 
     if (body.empty()) {
         if (err != 0) {
-            spdlog::error("HTTP GET 最终失败：WinHTTP code={} ({})",
+            spdlog::error("HTTP GET FAILED: WinHTTP code={} ({})",
                           err, winhttpErrText(err));
         } else {
-            spdlog::warn("HTTP GET 返回空 body，但无 WinHTTP 错误");
+            spdlog::warn("HTTP GET returned empty body, no Error");
         }
+        uptinfo.ok=false;
         Fl::awake(cb_okcheckUPT);
         return;
     }
