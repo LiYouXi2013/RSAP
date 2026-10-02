@@ -16,36 +16,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "spdlog_helper.h"
+#pragma once
+#include <FL/Fl_Window.H>
 #include "app_state.h"
 #include "random_selector.h"
-#include "main_window.h"
 #include "update_checker.h"
-#include <FL/Fl.H>
 
-int main(int argc, char **argv)
+namespace GeneralSettingsDialog
 {
-    spdlogInit();
-    spdlog::info("SpdLog Inited");
-
-    AppState appState;
-    appState.loadFromIni();
-    spdlog::info("Configurations read");
-
-    RandomSelector selector;
-    selector.setSeed(appState.seed);
-    selector.setPersonList(appState.persons);
-
-    UpdateChecker updateChecker;
-
-    Fl::set_font(FL_HELVETICA, "Consolas");
-    Fl::set_font(FL_HELVETICA_BOLD, "BConsolas");
-    Fl::set_font(FL_HELVETICA_ITALIC, "Huiwen‑Fangsong");
-
-    MainWindow wnd(Fl::w() - 400, Fl::h() - 420, 300, 320, "RSAP", appState, selector, updateChecker);
-    wnd.show();
-    Fl::get_system_colors();
-    Fl::lock();
-
-    return Fl::run();
+    void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel, UpdateChecker& uc);
 }

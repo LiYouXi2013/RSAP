@@ -16,24 +16,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#pragma once
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
-#include <Fl/Fl_Value_Input.H>
+#include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Output.H>
 #include <string>
 
 class VI : public Fl_Value_Input
 {
 public:
-    VI(int x, int y, int w, int h, const char *l = 0)
+    VI(int x, int y, int w, int h, const char *l = nullptr)
         : Fl_Value_Input(x, y, w, h, l) {}
-
-    // 2. 重写 format 方法
     int format(char *buffer) override
     {
-        // 使用 snprintf 以 %lld 格式输出 long long
-        // 这样即使数值很大也能完整显示
-        long long val = (long long)this->value();
+        long long val = static_cast<long long>(this->value());
         return snprintf(buffer, 128, "%lld", val);
     }
 };
@@ -41,35 +38,28 @@ public:
 class RFO : public Fl_Output
 {
 public:
-    RFO(int X, int Y, int W, int H, const char* L = nullptr) : Fl_Output(X, Y, W, H, L)
-    {}
+    RFO(int X, int Y, int W, int H, const char* L = nullptr)
+        : Fl_Output(X, Y, W, H, L) {}
 
     void fontsize(int s)
     {
-        size = s;
+        m_size = s;
     }
 
     void draw() override
     {
-        draw_box(); // 只绘制底板边框，不绘制原生左对齐文字
-
+        draw_box();
         const char *txt = value();
         if (!txt || !*txt) return;
-
-        fl_font(FL_HELVETICA_BOLD, size);
+        fl_font(FL_HELVETICA_BOLD, m_size);
         int textW, textH;
         fl_measure(txt, textW, textH, 0);
-
-
         int innerW = w() - 8;
         int drawX = x() + 4 + (innerW - textW) / 2;
         int drawY = y() + h() / 4 + textH / 2;
-
         fl_color(textcolor());
-
         fl_draw(txt, drawX, drawY);
     }
-
 protected:
-    int size = 1;
+    int m_size = 1;
 };
