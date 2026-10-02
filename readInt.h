@@ -15,17 +15,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+#pragma once
 
 #include <vector>
 #include <string>
 #include <sstream>
 #include <iostream>
 
-using namespace std;
-
 struct Person;
 
-vector<Person> readInt(const string& t)
+std::vector<Person> readInt(const std::string& t)
 {
     auto l = t.begin();
     while (l != t.end() && std::isspace(*l)) ++l;
@@ -33,16 +32,16 @@ vector<Person> readInt(const string& t)
     do {
         --r;
     } while (std::distance(l, r) > 0 && std::isspace(*r));
-    string s = string(l, r + 1);
+    std::string s = std::string(l, r + 1);
 
     std::vector<Person> res;
     std::stringstream ss(s);
     std::string item;
-    string t1;
-    string t2;
+    std::string t1;
+    std::string t2;
 
     while (std::getline(ss, item, ',')) {
-        stringstream t3(item);
+        std::stringstream t3(item);
         getline(t3, t1, '-');
         getline(t3, t2, '-');
 

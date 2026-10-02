@@ -20,6 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "readInt.h"
 #include "customWidgets.h"
 #include "updateChecker.h"
+#include "appState.h"
+
 #include <windows.h>
 #include <iostream>
 #include <string.h>
@@ -65,22 +67,15 @@ void SpdLogInit();
 
 using namespace std;
 
-personVec class1;
-uint32_t seed;
-double ast;
-bool isdef = false;
 RFO *disp;
 Fl_Button *start;
 Fl_Output *no;
-uint32_t ats;
-bool as = false;
-struct timeb tick;
-int cc;
-vector<int> weightdq;
-bool shown = true;
 
 Fl_Double_Window *window;
 Fl_Double_Window *showit;
+
+struct timeb tick;
+int cc;
 
 void keep_on_top(void*)
 {
