@@ -15,7 +15,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#pragma once
 
 #include <vector>
 #include <random>
@@ -28,7 +27,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using namespace std;
 
-extern mt19937 gen;
+static mt19937 gen(0);
 
 struct Person {
     string name = "无名氏";
