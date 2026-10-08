@@ -33,6 +33,7 @@ namespace PersonSettingsDialog
         VI *viWeight = nullptr;
         VI *viNoN = nullptr;
         Fl_Input *inpName = nullptr;
+        Fl_Window *wnd = nullptr;
     };
 
     static void cbSearchWeight(Fl_Widget*, void* ud)
@@ -99,11 +100,12 @@ namespace PersonSettingsDialog
     {
         Ctx* ctx = reinterpret_cast<Ctx *>(ud);
         ctx->state.saveToIni();
-        ((Fl_Window*)ud)->hide();
+        ctx->wnd->hide();
     }
     static void cbCancel(Fl_Widget*, void* ud)
     {
-        ((Fl_Window*)ud)->hide();
+        Ctx* ctx = reinterpret_cast<Ctx *>(ud);
+        ctx->wnd->hide();
     }
 
     void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel)
@@ -113,6 +115,7 @@ namespace PersonSettingsDialog
         Fl_Window wnd(px, py, 381, 185, "Settings");
         wnd.set_modal();
         Ctx ctx{state, sel};
+        ctx.wnd = &wnd;
 
         Fl_Group* grpW = new Fl_Group(0, 15, 190, 152, "Chance Adjuster");
         grpW->box(FL_SHADOW_FRAME);

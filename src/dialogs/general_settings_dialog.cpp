@@ -30,6 +30,7 @@ namespace GeneralSettingsDialog
         UpdateChecker &uc;
         VI *viSeed = nullptr;
         VI *viAst = nullptr;
+        Fl_Window *wnd = nullptr;
     };
 
     static void cbCheckUpdate(Fl_Widget*, void* ud)
@@ -46,12 +47,13 @@ namespace GeneralSettingsDialog
         ctx->state.isDefaultSeed = (ctx->state.seed == 0);
         ctx->sel.setSeed(ctx->state.seed);
         ctx->state.saveToIni();
-        ((Fl_Window*)ud)->hide();
+        ctx->wnd->hide();
     }
 
     static void cbCancel(Fl_Widget*, void* ud)
     {
-        ((Fl_Window*)ud)->hide();
+        DialogCtx* ctx = reinterpret_cast<DialogCtx *>(ud);
+        ctx->wnd->hide();
     }
 
     void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel, UpdateChecker& uc)
@@ -62,6 +64,7 @@ namespace GeneralSettingsDialog
         wnd.set_modal();
 
         DialogCtx ctx{state, sel, uc};
+        ctx.wnd = &wnd;
 
         ctx.viAst = new VI(151, 10, 64, 22, "Auto Stop Time:");
         ctx.viAst->value(state.ast);
