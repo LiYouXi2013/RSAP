@@ -36,10 +36,10 @@ namespace AboutDialog
         title.align(FL_ALIGN_CENTER);
 
         Fl_Box info(0, 70, 360, 100,
-                    "Randomly Select A Person: v0.1indev\n"
+                    "Randomly Select A Person: build 5\n"
                     "Developed Using FLTK\n\n"
                     "(c)2026 Candyman-RDFZ, LiYouXi2013 \nAll Rights Reserved.\n\n"
-                    "Fonts: Consolas, BConsolas, 汇文仿宋");
+                    "Fonts: Consolas, BConsolas");
         info.box(FL_NO_BOX);
         info.labelsize(14);
         info.align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);

@@ -24,6 +24,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <FL/fl_ask.H>
 #include <FL/fl_message.H>
 
+#include "utils.h"
+
 namespace PersonSettingsDialog
 {
     struct Ctx {
@@ -50,6 +52,8 @@ namespace PersonSettingsDialog
 
     static void cbApplyWeight(Fl_Widget*, void* ud)
     {
+        auto l = get_logger("ui.applyWeight");
+
         Ctx* ctx = reinterpret_cast<Ctx *>(ud);
         int no = static_cast<int>(ctx->viNoW->value());
         auto& pl = ctx->state.persons;
@@ -61,6 +65,7 @@ namespace PersonSettingsDialog
         pl[no - 1].weight = w;
         ctx->sel.setPersonList(pl);
         fl_message("Weight of No.%d has been changed to %d.", no, w);
+        l->info("Weight of No.{} has been changed to {}.", no, w);
     }
 
     static void cbSearchName(Fl_Widget*, void* ud)
@@ -77,6 +82,8 @@ namespace PersonSettingsDialog
 
     static void cbApplyName(Fl_Widget*, void* ud)
     {
+        auto l = get_logger("ui.applyWeight");
+
         Ctx* ctx = reinterpret_cast<Ctx *>(ud);
         int no = static_cast<int>(ctx->viNoN->value());
         auto& pl = ctx->state.persons;
@@ -94,6 +101,7 @@ namespace PersonSettingsDialog
         }
         ctx->sel.setPersonList(pl);
         fl_message("Name of No.%d has been changed to %s.", no, pl[no - 1].name.c_str());
+        l->info("Name of No.{} has been changed to {}.", no, pl[no - 1].name.c_str());
     }
 
     static void cbOk(Fl_Widget*, void* ud)

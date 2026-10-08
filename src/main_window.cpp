@@ -21,8 +21,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "dialogs/general_settings_dialog.h"
 #include "dialogs/person_settings_dialog.h"
 #include <windows.h>
-#include <spdlog/spdlog.h>
 #include <fl/platform.H>
+
+#include "utils.h"
 
 MainWindow::MainWindow(int X, int Y, int W, int H, const char* title,
                        AppState& state, RandomSelector& sel, UpdateChecker& uc)
@@ -147,7 +148,7 @@ void MainWindow::startRoll()
 
 void MainWindow::minimizeToFloat()
 {
-    spdlog::debug("Main->Float");
+    get_logger("ui.mainWnd")->debug("Main->Float");
     m_winX = x();
     m_winY = y();
     hide();
@@ -156,7 +157,7 @@ void MainWindow::minimizeToFloat()
 
 void MainWindow::restoreFromFloat()
 {
-    spdlog::debug("Float->Main");
+    get_logger("ui.mainWnd")->debug("Float->Main");
     position(m_winX, m_winY);
     m_floatWnd->hide();
     show();

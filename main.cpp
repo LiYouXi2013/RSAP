@@ -26,11 +26,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 int main(int argc, char **argv)
 {
     spdlogInit();
-    spdlog::info("SpdLog Inited");
+    auto l = get_logger("rsap.main");
+    l->info("SpdLog Inited");
 
     AppState appState;
     appState.loadFromIni();
-    spdlog::info("Configurations read");
+    l->info("Configurations read");
 
     RandomSelector selector;
     selector.setSeed(appState.seed);

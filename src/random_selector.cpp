@@ -18,7 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "random_selector.h"
 #include <algorithm>
-#include <spdlog/spdlog.h>
+
+#include "utils.h"
 
 void RandomSelector::setPersonList(const personVec& lst)
 {
@@ -44,7 +45,7 @@ bool RandomSelector::getNoRepeat() const
 void RandomSelector::setSeed(uint32_t seed)
 {
     m_gen.seed(seed);
-    spdlog::info("Seed set: {}", seed);
+    get_logger("worker.randomSelector")->info("Seed set: {}", seed);
 }
 
 void RandomSelector::resetNoRepeatPool()
@@ -69,12 +70,12 @@ int RandomSelector::randomPick()
     if (!m_noRepeat) {
         std::uniform_int_distribution<> dist(0, static_cast<int>(m_pool.size()) - 1);
         int rdd = m_pool[dist(m_gen)];
-        spdlog::info("Random: {}", rdd);
+        get_logger("worker.randomSelector")->info("Random: {}", rdd);
         return rdd;
     } else {
         if (m_lastNoRepeat == false || m_wtPool.empty()) {
             m_wtPool = m_pool;
-            spdlog::info("Copyed pool for no‑repeat");
+            get_logger("worker.randomSelector")->info("Copyed pool for no‑repeat");
         }
         std::uniform_int_distribution<> dist(0, static_cast<int>(m_wtPool.size()) - 1);
         int rdd = m_wtPool[dist(m_gen)];
@@ -89,7 +90,7 @@ int RandomSelector::randomPick()
                 m_wtPool.erase(it, m_wtPool.end());
         }
         m_lastNoRepeat = m_noRepeat;
-        spdlog::info("No Repeat Random: {}", rdd);
+        get_logger("worker.randomSelector")->info("No Repeat Random: {}", rdd);
         return rdd;
     }
 }

@@ -16,8 +16,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "read_int.h"
+#include "utils.h"
 #include <cctype>
+#include "spdlog_helper.h"
+
+extern std::vector<spdlog::sink_ptr> sinks;
 
 personVec readInt(const std::string& t)
 {
@@ -59,4 +62,15 @@ std::string join(const personVec &v)
         s += std::to_string(v[i].weight);
     }
     return s;
+}
+
+std::shared_ptr<spdlog::logger> get_logger(const std::string& name)
+{
+    auto l = spdlog::get(name);
+    if (!l) {
+        l = std::make_shared<spdlog::logger>(name, sinks.begin(), sinks.end());
+        l->set_pattern("%Y-%m-%d %H:%M:%S [%n/%^%l%$] %v");
+        spdlog::register_logger(l);
+    }
+    return l;
 }

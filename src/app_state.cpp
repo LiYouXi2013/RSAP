@@ -17,13 +17,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "app_state.h"
-#include "read_int.h"
 #include <windows.h>
 #include <random>
-#include <spdlog/spdlog.h>
+
+#include "utils.h"
 
 bool AppState::loadFromIni(const std::string& iniPath)
 {
+    auto l = get_logger("worker.appstate");
+
     char t1[65536] {};
     seed = static_cast<uint32_t>(GetPrivateProfileIntA("General", "Seed", 0, iniPath.c_str()));
     ast = GetPrivateProfileIntA("General", "AST", 0, iniPath.c_str());
@@ -32,24 +34,26 @@ bool AppState::loadFromIni(const std::string& iniPath)
     persons = readInt(std::string(t1));
 
     for (const auto& p : persons) {
-        spdlog::debug("Name: {} Weight: {}", p.name, p.weight);
+        l->debug("Name: {} Weight: {}", p.name, p.weight);
     }
 
     if (seed == 0) {
         static std::random_device rd;
         seed = rd();
         isDefaultSeed = true;
-        spdlog::debug("Used Def Seed");
+        l->debug("Used Def Seed");
     }
-    spdlog::info("Seed: {}", seed);
+    l->info("Seed: {}", seed);
     return true;
 }
 
 bool AppState::saveToIni(const std::string& iniPath)
 {
+    auto l = get_logger("worker.appstate");
+
     if (isDefaultSeed) {
         WritePrivateProfileStringA("General", "Seed", "0", iniPath.c_str());
-        spdlog::debug("Used Def Seed");
+        l->debug("Used Def Seed");
     } else {
         WritePrivateProfileStringA("General", "Seed", std::to_string(seed).c_str(), iniPath.c_str());
     }
@@ -59,6 +63,6 @@ bool AppState::saveToIni(const std::string& iniPath)
     }
     WritePrivateProfileStringA("General", "AST", std::to_string(static_cast<uint32_t>(ast)).c_str(), iniPath.c_str());
     WritePrivateProfileStringA("General", "Weight", join(persons).c_str(), iniPath.c_str());
-    spdlog::info("All settings saved");
+    l->info("All settings saved");
     return true;
 }

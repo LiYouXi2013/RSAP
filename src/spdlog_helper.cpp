@@ -21,6 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
+std::vector<spdlog::sink_ptr> sinks;
+
 void spdlogInit()
 {
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -28,7 +30,7 @@ void spdlogInit()
     console_sink->set_level(spdlog::level::debug);
     file_sink->set_level(spdlog::level::info);
 
-    std::vector<spdlog::sink_ptr> sinks{console_sink, file_sink};
+    sinks = {console_sink, file_sink};
     auto logger = std::make_shared<spdlog::logger>("RSAP", sinks.begin(), sinks.end());
     logger->set_pattern("%Y-%m-%d %H:%M:%S [%n/%^%l%$] %v");
     spdlog::register_logger(logger);
