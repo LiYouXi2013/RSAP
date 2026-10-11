@@ -24,8 +24,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class AppState
 {
 public:
-    bool loadFromIni(const std::string& iniPath = "./settings.ini");
-    bool saveToIni(const std::string& iniPath = "./settings.ini");
+    bool loadFromIni(const std::string& iniPathin = "settings.ini");
+    bool saveToIni(const std::string& iniPathin = "settings.ini");
 
     uint32_t seed = 0;
     double ast = 0.0;

@@ -25,6 +25,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "utils.h"
 
+extern std::string settingsName;
+
 MainWindow::MainWindow(int X, int Y, int W, int H, const char* title,
                        AppState& state, RandomSelector& sel, UpdateChecker& uc)
     : Fl_Double_Window(X, Y, W, H, title),
@@ -178,6 +180,8 @@ void MainWindow::openMoreDialog()
     btnPer->box(FL_PLASTIC_UP_BOX);
     grpSet->end();
 
+    Fl_Input *inputSettingsFileNameInput = new Fl_Input(100, 263, 120, 22, "Settings \\\nFile Name/");
+
     Fl_Button* btnAbout = new Fl_Button(60, 293, 64, 22, "About");
     btnAbout->box(FL_PLASTIC_UP_BOX);
     Fl_Button* btnOk = new Fl_Button(141, 293, 64, 22, "OK");
@@ -193,14 +197,42 @@ void MainWindow::openMoreDialog()
         PersonSettingsDialog::showModal(p, p->m_appState, p->m_selector);
     }, this);
 
+    inputSettingsFileNameInput->callback([](Fl_Widget* wg, void* ud){
+        MainWindow* p = reinterpret_cast<MainWindow *>(ud);
+        Fl_Input* ipt = (Fl_Input*)wg;
+        if(settingsName == ipt->value()){
+            p->m_settingsFileNameChanged = false;
+        }else{
+            p->m_settingsFileNameChanged = true;
+        }
+        p->m_newSettingName = ipt->value();
+    },this);
+
     btnAbout->callback([](Fl_Widget*, void* ud) {
         auto* p = reinterpret_cast<MainWindow *>(ud);
         AboutDialog::showModal(p);
     }, this);
 
+    struct uploadOK{
+        MainWindow* mainwnd;
+        Fl_Double_Window& more;
+
+    };
+    uploadOK upo{this,moreWnd};
+
     btnOk->callback([](Fl_Widget*, void* ud) {
-        ((Fl_Window*)ud)->hide();
-    }, &moreWnd);
+        auto* p = reinterpret_cast<uploadOK *>(ud);
+        if(p->mainwnd->m_settingsFileNameChanged){
+            FILE *settingsNamedat = fopen("snd","r+");
+            fprintf_s(settingsNamedat, "%s", p->mainwnd->m_newSettingName.c_str());
+            char cwd[65536];
+            GetCurrentDirectory(65536,&cwd);
+            string scwd = cwd;
+            scwd += "\\RSAP.exe";
+        }else{
+            p->more.hide();
+        }
+    }, &upo);
 
     moreWnd.end();
     moreWnd.show();

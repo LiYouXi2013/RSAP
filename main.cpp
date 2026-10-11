@@ -23,14 +23,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "update_checker.h"
 #include <FL/Fl.H>
 
+std::string settingsName = "settings.ini";
+
 int main(int argc, char **argv)
 {
     spdlogInit();
     auto l = get_logger("rsap.main");
     l->info("SpdLog Inited");
 
+    FILE *settingsNamedat = fopen("snd","r+");
+    if(!settingsNamedat){
+        system("echo settings.ini>snd");
+    }else{
+        char sn[64];
+        fscanf_s(settingsNamedat,"%s",sn);
+        settingsName = sn;
+    }
+
     AppState appState;
-    appState.loadFromIni();
+    appState.loadFromIni(settingsName);
     l->info("Configurations read");
 
     RandomSelector selector;

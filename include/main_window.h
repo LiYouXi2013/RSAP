@@ -57,6 +57,9 @@ private:
     int m_winX = 0;
     int m_winY = 0;
 
+    bool m_settingsFileNameChanged = false;
+    std::string m_newSettingName;
+
     AppState &m_appState;
     RandomSelector &m_selector;
     UpdateChecker &m_updateChecker;

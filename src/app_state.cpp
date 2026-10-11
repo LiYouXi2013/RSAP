@@ -22,9 +22,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "utils.h"
 
-bool AppState::loadFromIni(const std::string& iniPath)
+bool AppState::loadFromIni(const std::string& iniPathin)
 {
     auto l = get_logger("worker.appstate");
+
+    std::string iniPath = "./"+iniPathin;
 
     char t1[65536] {};
     seed = static_cast<uint32_t>(GetPrivateProfileIntA("General", "Seed", 0, iniPath.c_str()));
@@ -47,9 +49,10 @@ bool AppState::loadFromIni(const std::string& iniPath)
     return true;
 }
 
-bool AppState::saveToIni(const std::string& iniPath)
+bool AppState::saveToIni(const std::string& iniPathin)
 {
     auto l = get_logger("worker.appstate");
+    std::string iniPath = "./"+iniPathin;
 
     if (isDefaultSeed) {
         WritePrivateProfileStringA("General", "Seed", "0", iniPath.c_str());
