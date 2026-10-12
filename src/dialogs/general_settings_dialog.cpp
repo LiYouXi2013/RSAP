@@ -21,16 +21,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/fl_ask.H>
+#include <FL/Fl_Check_Button.H>
 
 namespace GeneralSettingsDialog
 {
     struct DialogCtx {
-        AppState &state;
+        AppState &realState;
+        AppState state;
         RandomSelector &sel;
         UpdateChecker &uc;
         VI *viSeed = nullptr;
         VI *viAst = nullptr;
         Fl_Window *wnd = nullptr;
+        Fl_Check_Button *btnHideCons = nullptr;
     };
 
     static void cbCheckUpdate(Fl_Widget*, void* ud)
@@ -45,8 +48,9 @@ namespace GeneralSettingsDialog
         ctx->state.seed = static_cast<uint32_t>(ctx->viSeed->value());
         ctx->state.ast = ctx->viAst->value();
         ctx->state.isDefaultSeed = (ctx->state.seed == 0);
+        ctx->state.showCons = ctx->btnHideCons->value();
         ctx->sel.setSeed(ctx->state.seed);
-        ctx->state.saveToIni();
+        ctx->realState = ctx->state;
         ctx->wnd->hide();
     }
 
@@ -60,10 +64,11 @@ namespace GeneralSettingsDialog
     {
         int px = parent ? parent->x() - 100 : 100;
         int py = parent ? parent->y() - 100 : 100;
-        Fl_Window wnd(px, py, 235, 167, "Settings");
+        Fl_Window wnd(px, py, 235, 207, "Settings");
         wnd.set_modal();
 
-        DialogCtx ctx{state, sel, uc};
+        AppState stateToBeChanged = state;
+        DialogCtx ctx{state, stateToBeChanged, sel, uc};
         ctx.wnd = &wnd;
 
         ctx.viAst = new VI(151, 10, 64, 22, "Auto Stop Time:");
@@ -76,10 +81,19 @@ namespace GeneralSettingsDialog
         Fl_Button* btnCheck = new Fl_Button(43, 95, 155, 20, "Check for Update");
         btnCheck->callback(cbCheckUpdate, &ctx);
 
-        Fl_Button* btnOk = new Fl_Button(127, 133, 64, 20, "OK");
+        Fl_Check_Button* btnHideConsole = new Fl_Check_Button(42, 125, 148, 22, "Show Console");
+        btnHideConsole->value(state.showCons);
+        btnHideConsole->callback([](Fl_Widget * a, void*) {
+            HWND hCons = GetConsoleWindow();
+            ShowWindow(hCons, ((Fl_Check_Button*)a)->value());
+        });
+
+        ctx.btnHideCons = btnHideConsole;
+
+        Fl_Button* btnOk = new Fl_Button(127, 153, 64, 20, "OK");
         btnOk->callback(cbOk, &ctx);
 
-        Fl_Button* btnCancel = new Fl_Button(42, 133, 64, 20, "Cancel");
+        Fl_Button* btnCancel = new Fl_Button(42, 153, 64, 20, "Cancel");
         btnCancel->callback(cbCancel, &wnd);
 
         wnd.end();

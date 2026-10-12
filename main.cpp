@@ -31,14 +31,18 @@ int main(int argc, char **argv)
     auto l = get_logger("rsap.main");
     l->info("SpdLog Inited");
 
-    FILE *settingsNamedat = fopen("snd","r+");
-    if(!settingsNamedat){
+    FILE *settingsNamedat = fopen("snd", "r+");
+    if (!settingsNamedat) {
+        l->info("settingsNamedat don't exist!");
         system("echo settings.ini>snd");
-    }else{
+        settingsName = "settings.ini";
+    } else {
         char sn[64];
-        fscanf_s(settingsNamedat,"%s",sn);
+        fscanf(settingsNamedat, "%s", sn);
         settingsName = sn;
     }
+
+    l->info("Settings file name: {}", settingsName);
 
     AppState appState;
     appState.loadFromIni(settingsName);

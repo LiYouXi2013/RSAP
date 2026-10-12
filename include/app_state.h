@@ -30,5 +30,6 @@ public:
     uint32_t seed = 0;
     double ast = 0.0;
     bool isDefaultSeed = false;
+    bool showCons = false;
     personVec persons;
 };

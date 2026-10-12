@@ -29,7 +29,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 namespace PersonSettingsDialog
 {
     struct Ctx {
-        AppState &state;
+        AppState &realState;
+        AppState state;
         RandomSelector &sel;
         VI *viNoW = nullptr;
         VI *viWeight = nullptr;
@@ -107,7 +108,7 @@ namespace PersonSettingsDialog
     static void cbOk(Fl_Widget*, void* ud)
     {
         Ctx* ctx = reinterpret_cast<Ctx *>(ud);
-        ctx->state.saveToIni();
+        ctx->realState = ctx->state;
         ctx->wnd->hide();
     }
     static void cbCancel(Fl_Widget*, void* ud)
@@ -122,7 +123,9 @@ namespace PersonSettingsDialog
         int py = parent ? parent->y() - 100 : 100;
         Fl_Window wnd(px, py, 381, 185, "Settings");
         wnd.set_modal();
-        Ctx ctx{state, sel};
+
+        AppState stateToBeChanged = state;
+        Ctx ctx{state, stateToBeChanged, sel};
         ctx.wnd = &wnd;
 
         Fl_Group* grpW = new Fl_Group(0, 15, 190, 152, "Chance Adjuster");

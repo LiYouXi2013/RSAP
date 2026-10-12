@@ -26,7 +26,7 @@ bool AppState::loadFromIni(const std::string& iniPathin)
 {
     auto l = get_logger("worker.appstate");
 
-    std::string iniPath = "./"+iniPathin;
+    std::string iniPath = "./" + iniPathin;
 
     char t1[65536] {};
     seed = static_cast<uint32_t>(GetPrivateProfileIntA("General", "Seed", 0, iniPath.c_str()));
@@ -46,13 +46,17 @@ bool AppState::loadFromIni(const std::string& iniPathin)
         l->debug("Used Def Seed");
     }
     l->info("Seed: {}", seed);
+
+    showCons = GetPrivateProfileIntA("General", "ShowCons", 1, iniPath.c_str());
+    ShowWindow(GetConsoleWindow(), showCons);
+
     return true;
 }
 
 bool AppState::saveToIni(const std::string& iniPathin)
 {
     auto l = get_logger("worker.appstate");
-    std::string iniPath = "./"+iniPathin;
+    std::string iniPath = "./" + iniPathin;
 
     if (isDefaultSeed) {
         WritePrivateProfileStringA("General", "Seed", "0", iniPath.c_str());
@@ -66,6 +70,7 @@ bool AppState::saveToIni(const std::string& iniPathin)
     }
     WritePrivateProfileStringA("General", "AST", std::to_string(static_cast<uint32_t>(ast)).c_str(), iniPath.c_str());
     WritePrivateProfileStringA("General", "Weight", join(persons).c_str(), iniPath.c_str());
+    WritePrivateProfileStringA("General", "ShowCons", std::to_string((int)showCons).c_str(), iniPath.c_str());
     l->info("All settings saved");
     return true;
 }

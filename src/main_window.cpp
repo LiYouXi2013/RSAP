@@ -181,6 +181,7 @@ void MainWindow::openMoreDialog()
     grpSet->end();
 
     Fl_Input *inputSettingsFileNameInput = new Fl_Input(100, 263, 120, 22, "Settings \\\nFile Name/");
+    inputSettingsFileNameInput->value(settingsName.c_str());
 
     Fl_Button* btnAbout = new Fl_Button(60, 293, 64, 22, "About");
     btnAbout->box(FL_PLASTIC_UP_BOX);
@@ -197,41 +198,31 @@ void MainWindow::openMoreDialog()
         PersonSettingsDialog::showModal(p, p->m_appState, p->m_selector);
     }, this);
 
-    inputSettingsFileNameInput->callback([](Fl_Widget* wg, void* ud){
+    inputSettingsFileNameInput->callback([](Fl_Widget * wg, void* ud) {
         MainWindow* p = reinterpret_cast<MainWindow *>(ud);
         Fl_Input* ipt = (Fl_Input*)wg;
-        if(settingsName == ipt->value()){
-            p->m_settingsFileNameChanged = false;
-        }else{
-            p->m_settingsFileNameChanged = true;
-        }
-        p->m_newSettingName = ipt->value();
-    },this);
+        settingsName = ipt->value();
+    }, this);
 
     btnAbout->callback([](Fl_Widget*, void* ud) {
         auto* p = reinterpret_cast<MainWindow *>(ud);
         AboutDialog::showModal(p);
     }, this);
 
-    struct uploadOK{
-        MainWindow* mainwnd;
-        Fl_Double_Window& more;
-
+    struct uploadOK {
+        MainWindow *mainwnd;
+        Fl_Double_Window &more;
     };
-    uploadOK upo{this,moreWnd};
+    uploadOK upo{this, moreWnd};
 
     btnOk->callback([](Fl_Widget*, void* ud) {
         auto* p = reinterpret_cast<uploadOK *>(ud);
-        if(p->mainwnd->m_settingsFileNameChanged){
-            FILE *settingsNamedat = fopen("snd","r+");
-            fprintf_s(settingsNamedat, "%s", p->mainwnd->m_newSettingName.c_str());
-            char cwd[65536];
-            GetCurrentDirectory(65536,&cwd);
-            string scwd = cwd;
-            scwd += "\\RSAP.exe";
-        }else{
-            p->more.hide();
-        }
+        p->mainwnd->m_appState.saveToIni(settingsName);
+
+        FILE *settingsNamedat = fopen("snd", "w+");
+        fprintf(settingsNamedat, "%s", settingsName.c_str());
+
+        p->more.hide();
     }, &upo);
 
     moreWnd.end();
