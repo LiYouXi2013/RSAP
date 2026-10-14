@@ -28,7 +28,7 @@ public:
     bool saveToIni(const std::string& iniPathin = "settings.ini");
 
     uint32_t seed = 0;
-    double ast = 0.0;
+    uint32_t ast = 0;
     bool isDefaultSeed = false;
     bool showCons = false;
     personVec persons;

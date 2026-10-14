@@ -45,9 +45,7 @@ namespace GeneralSettingsDialog
     static void cbOk(Fl_Widget*, void* ud)
     {
         DialogCtx* ctx = reinterpret_cast<DialogCtx *>(ud);
-        ctx->state.seed = static_cast<uint32_t>(ctx->viSeed->value());
         ctx->state.ast = ctx->viAst->value();
-        ctx->state.isDefaultSeed = (ctx->state.seed == 0);
         ctx->state.showCons = ctx->btnHideCons->value();
         ctx->sel.setSeed(ctx->state.seed);
         ctx->realState = ctx->state;
@@ -77,6 +75,15 @@ namespace GeneralSettingsDialog
         new Fl_Box(42, 45, 148, 20, "Random Seed");
         ctx.viSeed = new VI(42, 65, 148, 22, "");
         ctx.viSeed->value(state.seed);
+        ctx.viSeed->callback([](Fl_Widget * a, void* ud) {
+            VI* vi = (VI*)a;
+            DialogCtx* ctx = (DialogCtx*)ud;
+            ctx->state.seed = (uint32_t)vi->value();
+            ctx->state.isDefaultSeed = false;
+            if (ctx->state.seed == 0) {
+                ctx->state.isDefaultSeed = true;
+            }
+        }, &ctx);
 
         Fl_Button* btnCheck = new Fl_Button(43, 95, 155, 20, "Check for Update");
         btnCheck->callback(cbCheckUpdate, &ctx);

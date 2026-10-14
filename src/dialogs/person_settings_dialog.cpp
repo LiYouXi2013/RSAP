@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <FL/Fl_Button.H>
 #include <FL/fl_ask.H>
 #include <FL/fl_message.H>
+#include "editable_table.h"
 
 #include "utils.h"
 
@@ -123,6 +124,20 @@ namespace PersonSettingsDialog
         int py = parent ? parent->y() - 100 : 100;
         Fl_Window wnd(px, py, 381, 185, "Settings");
         wnd.set_modal();
+
+        EditableTable *et = new EditableTable(0,0,381,185,4,2);
+        et->set_data({
+            {"1","a"},
+            {"2","b"},
+            {"3","c"},
+            {"4","d"}
+        });
+        
+        wnd.end();
+        wnd.show();
+        while (wnd.shown()) Fl::wait();
+
+        return;
 
         AppState stateToBeChanged = state;
         Ctx ctx{state, stateToBeChanged, sel};

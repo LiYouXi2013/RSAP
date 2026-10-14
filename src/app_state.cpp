@@ -60,7 +60,7 @@ bool AppState::saveToIni(const std::string& iniPathin)
 
     if (isDefaultSeed) {
         WritePrivateProfileStringA("General", "Seed", "0", iniPath.c_str());
-        l->debug("Used Def Seed");
+        l->info("Used Def Seed");
     } else {
         WritePrivateProfileStringA("General", "Seed", std::to_string(seed).c_str(), iniPath.c_str());
     }
