@@ -33,89 +33,21 @@ namespace PersonSettingsDialog
         AppState &realState;
         AppState state;
         RandomSelector &sel;
-        VI *viNoW = nullptr;
-        VI *viWeight = nullptr;
-        VI *viNoN = nullptr;
-        Fl_Input *inpName = nullptr;
         Fl_Window *wnd = nullptr;
+        EditableTable *etable = nullptr;
     };
-
-    static void cbSearchWeight(Fl_Widget*, void* ud)
-    {
-        Ctx* ctx = reinterpret_cast<Ctx *>(ud);
-        int no = static_cast<int>(ctx->viNoW->value());
-        auto& pl = ctx->state.persons;
-        if (no < 1 || no > (int)pl.size()) {
-            ctx->viWeight->value(-1);
-            return;
-        }
-        ctx->viWeight->value(pl[no - 1].weight);
-    }
-
-    static void cbApplyWeight(Fl_Widget*, void* ud)
-    {
-        auto l = get_logger("ui.applyWeight");
-
-        Ctx* ctx = reinterpret_cast<Ctx *>(ud);
-        int no = static_cast<int>(ctx->viNoW->value());
-        auto& pl = ctx->state.persons;
-        int w = static_cast<int>(ctx->viWeight->value());
-        if (no < 1 || no > (int)pl.size() || w < 0) {
-            fl_alert("Invalid input!\nYou can add a new person in \"Name Setting\".");
-            return;
-        }
-        pl[no - 1].weight = w;
-        ctx->sel.setPersonList(pl);
-        fl_message("Weight of No.%d has been changed to %d.", no, w);
-        l->info("Weight of No.{} has been changed to {}.", no, w);
-    }
-
-    static void cbSearchName(Fl_Widget*, void* ud)
-    {
-        Ctx* ctx = reinterpret_cast<Ctx *>(ud);
-        int no = static_cast<int>(ctx->viNoN->value());
-        auto& pl = ctx->state.persons;
-        if (no < 1 || no > (int)pl.size()) {
-            ctx->inpName->value("无名氏");
-            return;
-        }
-        ctx->inpName->value(pl[no - 1].name.c_str());
-    }
-
-    static void cbApplyName(Fl_Widget*, void* ud)
-    {
-        auto l = get_logger("ui.applyWeight");
-
-        Ctx* ctx = reinterpret_cast<Ctx *>(ud);
-        int no = static_cast<int>(ctx->viNoN->value());
-        auto& pl = ctx->state.persons;
-        const char *nm = ctx->inpName->value();
-        if (no < 1) {
-            fl_alert("Invalid input!");
-            return;
-        }
-        if (no > (int)pl.size()) {
-            no = static_cast<int>(pl.size() + 1);
-            ctx->viNoN->value(no);
-            pl.push_back({std::string(nm), 1});
-        } else {
-            pl[no - 1].name = std::string(nm);
-        }
-        ctx->sel.setPersonList(pl);
-        fl_message("Name of No.%d has been changed to %s.", no, pl[no - 1].name.c_str());
-        l->info("Name of No.{} has been changed to {}.", no, pl[no - 1].name.c_str());
-    }
 
     static void cbOk(Fl_Widget*, void* ud)
     {
         Ctx* ctx = reinterpret_cast<Ctx *>(ud);
         ctx->realState = ctx->state;
+        ctx->sel.setPersonList(ctx->realState.persons);
         ctx->wnd->hide();
     }
     static void cbCancel(Fl_Widget*, void* ud)
     {
-        Ctx* ctx = reinterpret_cast<Ctx *>(ud);
-        ctx->wnd->hide();
+        Fl_Window* wnd = reinterpret_cast<Fl_Window *>(ud);
+        wnd->hide();
     }
 
     void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel)
@@ -125,50 +57,27 @@ namespace PersonSettingsDialog
         Fl_Window wnd(px, py, 381, 185, "Settings");
         wnd.set_modal();
 
-        EditableTable *et = new EditableTable(0,0,381,185,4,2);
-        et->set_data({
-            {"1","a"},
-            {"2","b"},
-            {"3","c"},
-            {"4","d"}
-        });
-        
-        wnd.end();
-        wnd.show();
-        while (wnd.shown()) Fl::wait();
-
-        return;
-
         AppState stateToBeChanged = state;
         Ctx ctx{state, stateToBeChanged, sel};
         ctx.wnd = &wnd;
 
-        Fl_Group* grpW = new Fl_Group(0, 15, 190, 152, "Chance Adjuster");
-        grpW->box(FL_SHADOW_FRAME);
-        ctx.viNoW = new VI(90, 33, 64, 22, "No.:");
-        ctx.viWeight = new VI(90, 63, 64, 22, "Weight:");
-        Fl_Button* btnSearchW = new Fl_Button(90, 93, 64, 24, "Search");
-        Fl_Button* btnApplyW = new Fl_Button(90, 125, 64, 24, "Apply");
-        btnSearchW->callback(cbSearchWeight, &ctx);
-        btnApplyW->callback(cbApplyWeight, &ctx);
-        grpW->labelfont(1);
-        grpW->end();
+        std::vector<std::vector<std::string>> etVec;
+        for (const Person& i : state.persons) {
+            etVec.push_back({i.name, std::to_string(i.weight)});
+        }
 
-        Fl_Group* grpN = new Fl_Group(191, 15, 190, 152, "Name");
-        grpN->box(FL_SHADOW_FRAME);
-        ctx.viNoN = new VI(281, 33, 64, 22, "No.:");
-        ctx.inpName = new Fl_Input(281, 63, 64, 22, "Name:");
-        ctx.inpName->value("无名氏");
-        Fl_Button* btnSearchN = new Fl_Button(281, 93, 64, 24, "Search");
-        Fl_Button* btnApplyN = new Fl_Button(281, 125, 64, 24, "Apply");
-        btnSearchN->callback(cbSearchName, &ctx);
-        btnApplyN->callback(cbApplyName, &ctx);
-        grpN->labelfont(1);
-        grpN->end();
+        EditableTable et = EditableTable(0, 0, 260, 185, 4, 2);
+        et.set_data(etVec);
 
-        Fl_Button* ok = new Fl_Button(270, 165, 64, 20, "OK");
+        et.set_col_headers({
+            "Name", "Weight"
+        });
+
+        ctx.etable = &et;
+
+        Fl_Button* ok = new Fl_Button(290, 100, 64, 20, "OK");
         ok->callback(cbOk, &ctx);
-        Fl_Button* cancel = new Fl_Button(42, 165, 64, 20, "Cancel");
+        Fl_Button* cancel = new Fl_Button(290, 150, 64, 20, "Cancel");
         cancel->callback(cbCancel, &wnd);
 
         wnd.end();

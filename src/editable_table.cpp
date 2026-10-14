@@ -4,8 +4,9 @@
 #include <FL/Fl.H>
 #include <cstdio>
 
-EditableTable::EditableTable(int X, int Y, int W, int H, int rowsum, int colsum,const char* L)
-    : Fl_Table(X, Y, W, H, L), editor(nullptr), edit_row(-1), edit_col(-1) {
+EditableTable::EditableTable(int X, int Y, int W, int H, int rowsum, int colsum, const char* L)
+    : Fl_Table(X, Y, W, H, L), editor(nullptr), edit_row(-1), edit_col(-1)
+{
     rows(rowsum);
     cols(colsum);
     row_header(1);
@@ -20,7 +21,8 @@ EditableTable::EditableTable(int X, int Y, int W, int H, int rowsum, int colsum,
     editor->when(FL_WHEN_ENTER_KEY | FL_WHEN_RELEASE);
 }
 
-void EditableTable::set_data(const std::vector<std::vector<std::string>>& d) {
+void EditableTable::set_data(const std::vector<std::vector<std::string>> &d)
+{
     data = d;
 
     // 根据数据自动设置行列数
@@ -36,12 +38,28 @@ void EditableTable::set_data(const std::vector<std::vector<std::string>>& d) {
     redraw();  // 重绘
 }
 
-void EditableTable::editor_cb(Fl_Widget* w, void* v) {
-    EditableTable* t = static_cast<EditableTable*>(v);
+void EditableTable::set_col_headers(const std::vector<std::string> &headers)
+{
+    col_headers = headers;
+    cols((int)headers.size());   // 列数跟着表头走
+    redraw();
+}
+
+void EditableTable::set_row_headers(const std::vector<std::string> &headers)
+{
+    row_headers = headers;
+    rows((int)headers.size());   // 行数跟着行头走
+    redraw();
+}
+
+void EditableTable::editor_cb(Fl_Widget* w, void* v)
+{
+    EditableTable* t = static_cast<EditableTable *>(v);
     t->commit_edit();
 }
 
-void EditableTable::commit_edit() {
+void EditableTable::commit_edit()
+{
     if (edit_row >= 0 && edit_col >= 0) {
         data[edit_row][edit_col] = editor->value();
         edit_row = edit_col = -1;
@@ -50,7 +68,8 @@ void EditableTable::commit_edit() {
     redraw();
 }
 
-void EditableTable::start_edit(int R, int C) {
+void EditableTable::start_edit(int R, int C)
+{
     if (edit_row >= 0) commit_edit();
 
     int X, Y, W, H;
@@ -65,7 +84,8 @@ void EditableTable::start_edit(int R, int C) {
     redraw();
 }
 
-int EditableTable::handle(int event) {
+int EditableTable::handle(int event)
+{
     if (event == FL_PUSH) {
         int R, C;
         ResizeFlag rf;
@@ -80,28 +100,41 @@ int EditableTable::handle(int event) {
 }
 
 void EditableTable::draw_cell(TableContext context, int R, int C,
-                              int X, int Y, int W, int H) {
+                              int X, int Y, int W, int H)
+{
     switch (context) {
         case CONTEXT_STARTPAGE:
             fl_font(FL_HELVETICA, 12);
             return;
 
         case CONTEXT_COL_HEADER: {
-            char s[16];
-            sprintf(s, "列 %d", C);
+            std::string text;
+            if (C >= 0 && C < (int)col_headers.size())
+                text = col_headers[C];
+            else {
+                char s[16]; sprintf(s, "%d", C + 1); text = s;
+            }
+
             fl_push_clip(X, Y, W, H);
             fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, FL_BACKGROUND2_COLOR);
-            fl_draw(s, X, Y, W, H, FL_ALIGN_CENTER);
+            fl_color(FL_BLACK);
+            fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_CENTER);
             fl_pop_clip();
             return;
         }
 
         case CONTEXT_ROW_HEADER: {
-            char s[16];
-            sprintf(s, "行 %d", R);
+            std::string text;
+            if (R >= 0 && R < (int)row_headers.size())
+                text = row_headers[R];
+            else {
+                char s[16]; sprintf(s, "%d", R + 1); text = s;
+            }
+
             fl_push_clip(X, Y, W, H);
             fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, FL_BACKGROUND2_COLOR);
-            fl_draw(s, X, Y, W, H, FL_ALIGN_CENTER);
+            fl_color(FL_BLACK);
+            fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_CENTER);
             fl_pop_clip();
             return;
         }
@@ -109,7 +142,12 @@ void EditableTable::draw_cell(TableContext context, int R, int C,
         case CONTEXT_CELL: {
             if (R == edit_row && C == edit_col) return; // 正在编辑，不画
             fl_push_clip(X, Y, W, H);
-            fl_color(FL_WHITE);
+            if (C % 2 == 1) {
+                fl_color(fl_rgb_color(208, 230, 175));
+            } else {
+                fl_color(fl_rgb_color(188, 216, 230));
+            }
+            // fl_color(FL_WHITE);
             fl_rectf(X, Y, W, H);
             fl_color(FL_BLACK);
             fl_draw(data[R][C].c_str(), X, Y, W, H, FL_ALIGN_LEFT);
