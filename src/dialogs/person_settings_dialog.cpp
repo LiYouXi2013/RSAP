@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <FL/Fl_Button.H>
 #include <FL/fl_ask.H>
 #include <FL/fl_message.H>
+#include <FL/Fl_Double_Window.H>
 #include "editable_table.h"
 
 #include "utils.h"
@@ -32,7 +33,7 @@ namespace PersonSettingsDialog
     struct Ctx {
         AppState &realState;
         RandomSelector &sel;
-        Fl_Window *wnd = nullptr;
+        Fl_Double_Window *wnd = nullptr;
         EditableTable *etable = nullptr;
     };
 
@@ -49,7 +50,7 @@ namespace PersonSettingsDialog
     }
     static void cbCancel(Fl_Widget*, void* ud)
     {
-        Fl_Window* wnd = reinterpret_cast<Fl_Window *>(ud);
+        Fl_Double_Window* wnd = reinterpret_cast<Fl_Double_Window *>(ud);
         wnd->hide();
     }
 
@@ -57,7 +58,7 @@ namespace PersonSettingsDialog
     {
         int px = parent ? parent->x() - 100 : 100;
         int py = parent ? parent->y() - 100 : 100;
-        Fl_Window wnd(px, py, 381, 185, "Settings");
+        Fl_Double_Window wnd(px, py, 381, 185, "Settings");
         wnd.set_modal();
 
         Ctx ctx{state, sel};
