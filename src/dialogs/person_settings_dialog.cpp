@@ -31,7 +31,6 @@ namespace PersonSettingsDialog
 {
     struct Ctx {
         AppState &realState;
-        AppState state;
         RandomSelector &sel;
         Fl_Window *wnd = nullptr;
         EditableTable *etable = nullptr;
@@ -40,7 +39,11 @@ namespace PersonSettingsDialog
     static void cbOk(Fl_Widget*, void* ud)
     {
         Ctx* ctx = reinterpret_cast<Ctx *>(ud);
-        ctx->realState = ctx->state;
+        std::vector<std::vector<std::string>> tabledat = ctx->etable->get_data();
+        ctx->realState.persons.clear();
+        for(const auto& i:tabledat){
+            ctx->realState.persons.push_back({i[0],std::max(std::stoi(i[1]), 0)});
+        }
         ctx->sel.setPersonList(ctx->realState.persons);
         ctx->wnd->hide();
     }
@@ -57,8 +60,7 @@ namespace PersonSettingsDialog
         Fl_Window wnd(px, py, 381, 185, "Settings");
         wnd.set_modal();
 
-        AppState stateToBeChanged = state;
-        Ctx ctx{state, stateToBeChanged, sel};
+        Ctx ctx{state, sel};
         ctx.wnd = &wnd;
 
         std::vector<std::vector<std::string>> etVec;

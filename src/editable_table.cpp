@@ -90,7 +90,12 @@ int EditableTable::handle(int event)
         int R, C;
         ResizeFlag rf;
         TableContext ctx = cursor2rowcol(R, C, rf);
-
+        if (ctx == CONTEXT_ROW_HEADER) {
+            commit_edit();
+            selected_row = R;
+        }else{
+            selected_row=-1;
+        }
         if (ctx == CONTEXT_CELL && R >= 0 && C >= 0) {
             start_edit(R, C);
             return 1;
@@ -142,7 +147,9 @@ void EditableTable::draw_cell(TableContext context, int R, int C,
         case CONTEXT_CELL: {
             if (R == edit_row && C == edit_col) return; // 正在编辑，不画
             fl_push_clip(X, Y, W, H);
-            if (C % 2 == 1) {
+            if (R == selected_row){
+                fl_color(fl_rgb_color(228, 224, 243));
+            } else if (C % 2 == 1) {
                 fl_color(fl_rgb_color(208, 230, 175));
             } else {
                 fl_color(fl_rgb_color(188, 216, 230));

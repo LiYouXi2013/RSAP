@@ -11,6 +11,7 @@ class EditableTable : public Fl_Table
 {
 public:
     EditableTable(int X, int Y, int W, int H, int rolsum, int colsum, const char* L = 0);
+    std::vector<std::vector<std::string>> get_data(){return data;}
     void set_data(const std::vector<std::vector<std::string>> &d);
 
     void set_col_headers(const std::vector<std::string> &headers);
@@ -26,6 +27,7 @@ private:
     std::vector<std::vector<std::string>> data;    // 数据
     int edit_row;                                  // 正在编辑的行
     int edit_col;                                  // 正在编辑的列
+    int selected_row;
 
     void start_edit(int R, int C);                 // 开始编辑
     void commit_edit();                            // 提交编辑
