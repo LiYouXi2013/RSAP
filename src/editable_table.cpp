@@ -2,6 +2,7 @@
 #include "editable_table.h"
 #include <FL/fl_draw.H>
 #include <FL/Fl.H>
+#include <FL/Fl_Window.H>
 #include <cstdio>
 
 EditableTable::EditableTable(int X, int Y, int W, int H, int rowsum, int colsum, const char* L)
@@ -15,10 +16,23 @@ EditableTable::EditableTable(int X, int Y, int W, int H, int rowsum, int colsum,
     col_width_all(100);
     end();
 
-    editor = new Fl_Input(0, 0, 0, 0);
+    editor = new EditInput(0, 0, 0, 0);
     editor->hide();
     editor->callback(editor_cb, this);
     editor->when(FL_WHEN_ENTER_KEY | FL_WHEN_RELEASE);
+
+    when(FL_WHEN_RELEASE);
+    callback(internal_cb, this);
+}
+
+void EditableTable::internal_cb(Fl_Widget* w, void*)
+{
+    EditableTable* t = static_cast<EditableTable *>(w);
+    if (t->external_cb) {
+        t->external_cb(t->callback_row(),
+                       t->callback_col(),
+                       t->callback_context());
+    }
 }
 
 void EditableTable::set_data(const std::vector<std::vector<std::string>> &d)
@@ -48,7 +62,37 @@ void EditableTable::set_col_headers(const std::vector<std::string> &headers)
 void EditableTable::set_row_headers(const std::vector<std::string> &headers)
 {
     row_headers = headers;
-    rows((int)headers.size());   // 行数跟着行头走
+    rows((int)headers.size());
+    redraw();
+}
+
+void EditableTable::add_row(const std::vector<std::string> &row)
+{
+    std::vector<std::string> new_row = row;
+    int col_count = cols();
+    if ((int)new_row.size() < col_count)
+        new_row.resize(col_count, "");
+
+    data.push_back(new_row);
+    rows((int)data.size());
+    row_position((int)data.size() - 1);
+    redraw();
+}
+
+void EditableTable::remove_row(int index)
+{
+
+    if (index < 0 || index >= (int)data.size()) return;
+
+    if (edit_row == index) {
+        editor->hide();
+        edit_row = edit_col = -1;
+    } else if (edit_row > index) {
+        edit_row--;
+    }
+
+    data.erase(data.begin() + index);
+    rows((int)data.size());
     redraw();
 }
 
@@ -92,13 +136,21 @@ int EditableTable::handle(int event)
         TableContext ctx = cursor2rowcol(R, C, rf);
         if (ctx == CONTEXT_ROW_HEADER) {
             commit_edit();
-            selected_row = R;
-        }else{
-            selected_row=-1;
+            if (selected_row == R) {
+                selected_row = -1;
+            } else {
+                selected_row = R;
+            }
+        } else {
+            selected_row = -1;
         }
         if (ctx == CONTEXT_CELL && R >= 0 && C >= 0) {
-            start_edit(R, C);
-            return 1;
+            if (Fl::event_clicks() == 1) {
+                start_edit(R, C);
+                Fl::event_clicks(0);
+            } else {
+                commit_edit();
+            }
         }
     }
     return Fl_Table::handle(event);
@@ -147,7 +199,7 @@ void EditableTable::draw_cell(TableContext context, int R, int C,
         case CONTEXT_CELL: {
             if (R == edit_row && C == edit_col) return; // 正在编辑，不画
             fl_push_clip(X, Y, W, H);
-            if (R == selected_row){
+            if (R == selected_row) {
                 fl_color(fl_rgb_color(228, 224, 243));
             } else if (C % 2 == 1) {
                 fl_color(fl_rgb_color(208, 230, 175));
