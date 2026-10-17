@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "dialogs/person_settings_dialog.h"
 #include <windows.h>
 #include <fl/platform.H>
+#include <fstream>
 
 #include "utils.h"
 
@@ -140,7 +141,11 @@ void MainWindow::startRoll()
     if (!m_autoStop) {
         int ii = m_selector.randomPick();
         m_disp->value(std::to_string(ii + 1).c_str());
-        m_outputName->value(m_selector.getPersonList()[ii].name.c_str());
+        try{
+            m_outputName->value(m_selector.getPersonList().at(ii).name.c_str());
+        } catch(...){
+            m_outputName->value("   ??   ");
+        }
         m_outputName->redraw();
     } else {
         m_cc = static_cast<int>(m_appState.ast / 100);
@@ -219,8 +224,14 @@ void MainWindow::openMoreDialog()
         auto* p = reinterpret_cast<uploadOK *>(ud);
         p->mainwnd->m_appState.saveToIni(settingsName);
 
-        FILE *settingsNamedat = fopen("snd", "w+");
-        fprintf(settingsNamedat, "%s", settingsName.c_str());
+        std::ofstream createFile("snd");
+            if (createFile.is_open())
+            {
+                createFile << settingsName;
+                createFile.close();
+            } else {
+                
+            }
 
         p->more.hide();
     }, &upo);

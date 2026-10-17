@@ -92,7 +92,6 @@ namespace PersonSettingsDialog
         et.set_cb([&ctx](int R, int C, Fl_Table::TableContext tctx) {
             switch (tctx) {
                 case Fl_Table::CONTEXT_ROW_HEADER:
-                    std::cout << ctx.etable->getSelRow() << R << std::endl;
                     if (ctx.etable->getSelRow() == R) {
                         ctx.rm_btn->activate();
                     } else {
@@ -124,6 +123,7 @@ namespace PersonSettingsDialog
         remove_btn->callback([](Fl_Widget*, void* ud) {
             Ctx* ctx = (Ctx*)ud;
             ctx->etable->remove_row(ctx->etable->getSelRow());
+            ctx->rm_btn->deactivate();
         }, &ctx);
         ctx.add_btn = add_btn;
         ctx.rm_btn = remove_btn;

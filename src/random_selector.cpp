@@ -67,6 +67,9 @@ void RandomSelector::buildPool()
 
 int RandomSelector::randomPick()
 {
+    if(m_pool.empty()){
+        return -1;
+    }
     if (!m_noRepeat) {
         std::uniform_int_distribution<> dist(0, static_cast<int>(m_pool.size()) - 1);
         int rdd = m_pool[dist(m_gen)];

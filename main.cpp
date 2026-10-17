@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "main_window.h"
 #include "update_checker.h"
 #include <FL/Fl.H>
+#include <fstream>
 
 std::string settingsName = "settings.ini";
 
@@ -31,17 +32,24 @@ int main(int argc, char **argv)
     auto l = get_logger("rsap.main");
     l->info("SpdLog Inited");
 
-    FILE *settingsNamedat = fopen("snd", "r+");
-    if (!settingsNamedat) {
+    std::fstream settingsNamedat("snd", std::ios::in | std::ios::out);
+    if (!settingsNamedat.is_open()) {
         l->info("settingsNamedat don't exist!");
-        system("echo settings.ini>snd");
+        std::ofstream createFile("snd");
+        if (createFile.is_open())
+        {
+            createFile << "settings.ini";
+            createFile.close();
+        }
         settingsName = "settings.ini";
-    } else {
-        char sn[64];
-        fscanf(settingsNamedat, "%s", sn);
-        settingsName = sn;
     }
-
+    else {
+        char sn[64]{};
+        // 安全读取，最多读63字符
+        settingsNamedat.getline(sn, sizeof(sn));
+        settingsName = sn;
+        settingsNamedat.close();
+    }
     l->info("Settings file name: {}", settingsName);
 
     AppState appState;

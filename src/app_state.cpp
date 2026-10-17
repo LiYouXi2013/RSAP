@@ -36,14 +36,14 @@ bool AppState::loadFromIni(const std::string& iniPathin)
     persons = readInt(std::string(t1));
 
     for (const auto& p : persons) {
-        l->debug("Name: {} Weight: {}", p.name, p.weight);
+        l->info("Name: {} Weight: {}", p.name, p.weight);
     }
 
     if (seed == 0) {
         static std::random_device rd;
         seed = rd();
         isDefaultSeed = true;
-        l->debug("Used Def Seed");
+        l->info("Used Def Seed");
     }
     l->info("Seed: {}", seed);
 
