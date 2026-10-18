@@ -1,4 +1,4 @@
-#include "update_checker.h"/*
+/*
 RSAP
 Copyright (C) 2026 LiYouXi2013, Candyman_RDFZ
 
@@ -16,7 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-
+#include "update_checker.h"
+#include <string>
 #include <FL/fl_ask.H>
 
 void UpdateChecker::awakeCb(void* ud)
@@ -31,7 +32,8 @@ void UpdateChecker::awakeCb(void* ud)
             if (fl_ask("Found a newer version: %llu \n "
                        "Would you like to open the release page? \n"
                        "  Password: 1234", self->info.remoteVer)) {
-                system("start https://lyx201312.lanzouu.com/b00wnw20ri");
+                std::string zl="start " + (std::string)"https://liyouxi2013.github.io/RSAP/build/RSAP(build" + std::to_string(self->info.remoteVer) + ").exe";
+                system(zl.c_str());
             }
         }
     }
@@ -41,7 +43,7 @@ void UpdateChecker::awakeCb(void* ud)
 void UpdateChecker::workThread()
 {
     DWORD err = 0;
-    std::string body = httpGet(L"updatechecker.pages.dev", L"/rsap/version.txt", err);
+    std::string body = httpGet(L"liyouxi2013.github.io", L"/rsapver.txt", err);
     if (body.empty()) {
         info.ok = false;
         Fl::awake(awakeCb, this);
