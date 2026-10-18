@@ -20,6 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <string>
 #include <FL/fl_ask.H>
 
+extern unsigned long long localVer;
+
 void UpdateChecker::awakeCb(void* ud)
 {
     auto* self = reinterpret_cast<UpdateChecker *>(ud);
@@ -57,7 +59,7 @@ void UpdateChecker::workThread()
         return;
     }
     info.remoteVer = static_cast<unsigned long long>(remoteBuild);
-    info.newer = (remoteBuild > static_cast<long long>(info.localVer));
+    info.newer = (remoteBuild > static_cast<long long>(localVer));
     info.ok = true;
     Fl::awake(awakeCb, this);
 }

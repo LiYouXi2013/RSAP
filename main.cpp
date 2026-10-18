@@ -25,6 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <fstream>
 
 std::string settingsName = "settings.ini";
+unsigned long long localVer{10};
 
 int main(int argc, char **argv)
 {

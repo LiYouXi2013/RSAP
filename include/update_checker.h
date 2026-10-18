@@ -199,7 +199,6 @@ class UpdateChecker
 {
 public:
     struct UPTInfo {
-        unsigned long long localVer{10};
         unsigned long long remoteVer{0};
         bool newer = true;
         bool ok = true;

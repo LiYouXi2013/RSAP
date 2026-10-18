@@ -19,6 +19,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "dialogs/about_dialog.h"
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
+#include <string>
+
+extern unsigned long long localVer;
 
 namespace AboutDialog
 {
@@ -35,11 +38,12 @@ namespace AboutDialog
         title.labelfont(FL_BOLD);
         title.align(FL_ALIGN_CENTER);
 
-        Fl_Box info(0, 70, 360, 100,
-                    "Randomly Select A Person: build 5\n"
+        std::string abmsg = "Randomly Select A Person: build "+std::to_string(localVer)+"\n"
                     "Developed Using FLTK\n\n"
                     "(c)2026 Candyman-RDFZ, LiYouXi2013 \nAll Rights Reserved.\n\n"
-                    "Fonts: Consolas, BConsolas");
+                    "Fonts: Consolas, BConsolas";
+
+        Fl_Box info(0, 70, 360, 100,abmsg.c_str());
         info.box(FL_NO_BOX);
         info.labelsize(14);
         info.align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
