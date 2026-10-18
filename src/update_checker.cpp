@@ -34,8 +34,7 @@ void UpdateChecker::awakeCb(void* ud)
             if (fl_ask("Found a newer version: %llu \n "
                        "Would you like to open the release page? \n"
                        "  Password: 1234", self->info.remoteVer)) {
-                std::string zl="start " + (std::string)"https://liyouxi2013.github.io/RSAP/build/RSAP(build" + std::to_string(self->info.remoteVer) + ").exe";
-                system(zl.c_str());
+                system("start https://liyouxi2013.github.io/RSAP/downloads.html");
             }
         }
     }
