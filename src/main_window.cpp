@@ -20,13 +20,52 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "dialogs/about_dialog.h"
 #include "dialogs/general_settings_dialog.h"
 #include "dialogs/person_settings_dialog.h"
-#include <windows.h>
 #include <fl/platform.H>
 #include <fstream>
+
+#ifdef _WIN32
+#include <windows.h>
+using NativeHandle = HWND;
+
+inline bool SetWindowTopmost(NativeHandle hWnd, int flag)
+{
+    if (!hWnd) return false;
+    HWND insert = (flag == 1) ? HWND_TOPMOST : HWND_NOTOPMOST;
+    return ::SetWindowPos(hWnd, insert, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE) != 0;
+}
+
+#else
+#include <X11/Xlib.h>
+#include <cstring>
+using NativeHandle = Window;
+
+inline bool SetWindowTopmost(NativeHandle xid, int flag)
+{
+    if (xid == 0 || !fl_display) return false;
+
+    Atom wm_state = XInternAtom(fl_display, "_NET_WM_STATE", False);
+    Atom atom_above = XInternAtom(fl_display, "_NET_WM_STATE_ABOVE", False);
+
+    XEvent ev{};
+    memset(&ev, 0, sizeof ev);
+    ev.xclient.type = ClientMessage;
+    ev.xclient.window = xid;
+    ev.xclient.message_type = wm_state;
+    ev.xclient.format = 32;
+    ev.xclient.data.l[0] = (flag == 1) ? 1 : 0;
+    ev.xclient.data.l[1] = atom_above;
+    ev.xclient.data.l[2] = 0;
+
+    XSendEvent(fl_display, DefaultRootWindow(fl_display), True, SubstructureNotifyMask | SubstructureRedirectMask, &ev);
+    XFlush(fl_display);
+    return true;
+}
+#endif
 
 #include "utils.h"
 
 extern std::string settingsName;
+std::string lastSN;
 
 MainWindow::MainWindow(int X, int Y, int W, int H, const char* title,
                        AppState& state, RandomSelector& sel, UpdateChecker& uc)
@@ -97,11 +136,11 @@ void MainWindow::keepOnTop()
 {
     HWND hwnd = fl_xid(this);
     if (hwnd) {
-        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        SetWindowTopmost(hwnd, 1);
     }
     HWND hwnd2 = fl_xid(m_floatWnd);
     if (hwnd2) {
-        SetWindowPos(hwnd2, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        SetWindowTopmost(hwnd2, 1);
     }
     Fl::repeat_timeout(0.5, staticKeepOnTop, this);
 }
@@ -141,9 +180,9 @@ void MainWindow::startRoll()
     if (!m_autoStop) {
         int ii = m_selector.randomPick();
         m_disp->value(std::to_string(ii + 1).c_str());
-        try{
+        try {
             m_outputName->value(m_selector.getPersonList().at(ii).name.c_str());
-        } catch(...){
+        } catch (...) {
             m_outputName->value("   ??   ");
         }
         m_outputName->redraw();
@@ -172,6 +211,7 @@ void MainWindow::restoreFromFloat()
 
 void MainWindow::openMoreDialog()
 {
+    lastSN = settingsName;
     Fl::remove_timeout(staticKeepOnTop, this);
     Fl_Double_Window moreWnd(x() - 100, y() - 100, 220, 330);
     moreWnd.set_modal();
@@ -222,16 +262,14 @@ void MainWindow::openMoreDialog()
 
     btnOk->callback([](Fl_Widget*, void* ud) {
         auto* p = reinterpret_cast<uploadOK *>(ud);
-        p->mainwnd->m_appState.saveToIni(settingsName);
+        p->mainwnd->m_appState.saveToIni(lastSN);
+        p->mainwnd->m_appState.loadFromIni(settingsName);
 
         std::ofstream createFile("snd");
-            if (createFile.is_open())
-            {
-                createFile << settingsName;
-                createFile.close();
-            } else {
-                
-            }
+        if (createFile.is_open()) {
+            createFile << settingsName;
+            createFile.close();
+        }
 
         p->more.hide();
     }, &upo);

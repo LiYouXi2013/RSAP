@@ -17,8 +17,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "update_checker.h"
-#include <string>
 #include <FL/fl_ask.H>
+
+#ifdef _WIN32
+#include <string>
 
 extern unsigned long long localVer;
 
@@ -73,3 +75,19 @@ void UpdateChecker::backgroundCheck()
     std::thread t(&UpdateChecker::workThread, this);
     t.detach();
 }
+#else
+void UpdateChecker::backgroundCheck()
+{
+    fl_alert("Update Checker is not available on you device(macos/linux)!");
+}
+
+void UpdateChecker::awakeCb(void* ud)
+{
+
+}
+void UpdateChecker::workThread()
+{
+
+}
+#endif
+

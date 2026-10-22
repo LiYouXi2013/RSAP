@@ -17,14 +17,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #pragma once
-#include <windows.h>
-#include <winhttp.h>
 #include <cctype>
 #include <string>
 #include <thread>
 #include <chrono>
 #include "utils.h"
 #include <FL/Fl.H>
+
+#ifdef _WIN32
+#include <windows.h>
+#include <winhttp.h>
 
 static const char *winhttpErrText(DWORD err)
 {
@@ -174,6 +176,7 @@ static std::string httpGet(const std::wstring& host, const std::wstring& path,
     }
     return result;
 }
+#endif
 
 static std::string trim(const std::string& s)
 {
