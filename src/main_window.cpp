@@ -36,6 +36,7 @@ inline bool SetWindowTopmost(NativeHandle hWnd, int flag)
 
 #else
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include <cstring>
 using NativeHandle = Window;
 
@@ -134,11 +135,11 @@ void MainWindow::staticKeepOnTop(void* ud)
 
 void MainWindow::keepOnTop()
 {
-    HWND hwnd = fl_xid(this);
+    NativeHandle hwnd = fl_xid(this);
     if (hwnd) {
         SetWindowTopmost(hwnd, 1);
     }
-    HWND hwnd2 = fl_xid(m_floatWnd);
+    NativeHandle hwnd2 = fl_xid(m_floatWnd);
     if (hwnd2) {
         SetWindowTopmost(hwnd2, 1);
     }

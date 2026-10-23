@@ -23,6 +23,98 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <FL/fl_ask.H>
 #include <FL/Fl_Check_Button.H>
 
+#ifdef _WIN32
+#include <windows.h>
+using ConsoleHandle = HWND;
+
+inline ConsoleHandle GetConsoleWindowHandle()
+{
+    return ::GetConsoleWindow();
+}
+
+// flag: 0=隐藏，1=显示
+inline bool ShowHideConsole(ConsoleHandle hCon, int flag)
+{
+    if (!hCon) return false;
+    if (flag == 0)
+        return ::ShowWindow(hCon, SW_HIDE) != 0;
+    else if (flag == 1)
+        return ::ShowWindow(hCon, SW_SHOW) != 0;
+    return false;
+}
+
+#else
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <unistd.h>
+#include <sys/types.h>
+using ConsoleHandle = Window;
+
+static Window find_xwindow_by_pid(Display* dpy, pid_t target_pid)
+{
+    Window root, parent;
+    Window* children = nullptr;
+    unsigned int nchild = 0;
+    if (!XQueryTree(dpy, DefaultRootWindow(dpy), &root, &parent, &children, &nchild))
+        return 0;
+
+    Window result = 0;
+    Atom wm_pid_atom = XInternAtom(dpy, "_NET_WM_PID", False);
+
+    for (unsigned int i = 0; i < nchild; ++i) {
+        unsigned long *val = nullptr;
+        Atom type;
+        int fmt;
+        unsigned long nItems, bytesAfter;
+
+        if (XGetWindowProperty(dpy, children[i], wm_pid_atom, 0, 1, False, XA_CARDINAL,
+                               &type, &fmt, &nItems, &bytesAfter,
+                               reinterpret_cast<unsigned char * *>(&val)) == Success
+                && type == XA_CARDINAL && nItems >= 1) {
+            if (static_cast<pid_t>(*val) == target_pid) {
+                result = children[i];
+                XFree(val);
+                break;
+            }
+            XFree(val);
+        }
+    }
+    XFree(children);
+    return result;
+}
+
+inline ConsoleHandle GetConsoleWindowHandle()
+{
+    Display* dpy = XOpenDisplay(nullptr);
+    if (!dpy) return 0;
+
+    pid_t ppid = getppid();
+    Window xid = find_xwindow_by_pid(dpy, ppid);
+    XCloseDisplay(dpy);
+    return xid;
+}
+
+// flag: 0=隐藏，1=显示
+inline bool ShowHideConsole(ConsoleHandle hCon, int flag)
+{
+    if (hCon == 0) return false;
+    Display* dpy = XOpenDisplay(nullptr);
+    if (!dpy) return false;
+
+    bool ok = false;
+    if (flag == 0) {
+        XUnmapWindow(dpy, hCon);
+        ok = true;
+    } else if (flag == 1) {
+        XMapWindow(dpy, hCon);
+        ok = true;
+    }
+    XFlush(dpy);
+    XCloseDisplay(dpy);
+    return ok;
+}
+#endif
+
 namespace GeneralSettingsDialog
 {
     struct DialogCtx {
@@ -91,8 +183,7 @@ namespace GeneralSettingsDialog
         Fl_Check_Button* btnHideConsole = new Fl_Check_Button(42, 125, 148, 22, "Show Console");
         btnHideConsole->value(state.showCons);
         btnHideConsole->callback([](Fl_Widget * a, void*) {
-            HWND hCons = GetConsoleWindow();
-            ShowWindow(hCons, ((Fl_Check_Button*)a)->value());
+            ShowHideConsole(GetConsoleWindowHandle(), ((Fl_Check_Button*)a)->value());
         });
 
         ctx.btnHideCons = btnHideConsole;

@@ -46,6 +46,7 @@ inline bool ShowHideConsole(ConsoleHandle hCon, int flag)
 
 #else
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include <unistd.h>
 #include <sys/types.h>
 using ConsoleHandle = Window;
@@ -126,13 +127,16 @@ bool AppState::loadFromIni(const std::string& iniPathin)
         std::ifstream f(iniPathin);
         if (!f.is_open()) {
             l->warn("Config file not found: {}", iniPathin);
-        } else {
-            try {
-                f >> j;
-            } catch (const std::exception& e) {
-                l->error("Failed to parse config {}: {}", iniPathin, e.what());
-                j = json::object();
-            }
+            freopen("settings.json", "w", stdout);
+            std::cout<<'\n';
+            fclose(stdout);
+        } 
+
+        try {
+            f >> j;
+        } catch (const std::exception& e) {
+            l->error("Failed to parse config {}: {}", iniPathin, e.what());
+            j = json::object();
         }
     }
 

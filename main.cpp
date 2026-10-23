@@ -24,14 +24,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <FL/Fl.H>
 #include <fstream>
 
-std::string settingsName = "settings.ini";
+std::string settingsName = "settings.json";
 unsigned long long localVer{10};
 
 int main(int argc, char **argv)
 {
+    system("chcp 65001>nul");
     spdlogInit();
     auto l = get_logger("rsap.main");
-    l->info("SpdLog Inited");
+    l->info("SpdLog Initalized");
 
     std::fstream settingsNamedat("snd", std::ios::in | std::ios::out);
     if (!settingsNamedat.is_open()) {
@@ -39,10 +40,26 @@ int main(int argc, char **argv)
         std::ofstream createFile("snd");
         if (createFile.is_open())
         {
-            createFile << "settings.ini";
+            createFile << "settings.json";
             createFile.close();
         }
-        settingsName = "settings.ini";
+        settingsName = "settings.json";
+/*
+        std::ifstream defst("settings.json");
+        if (!defst.is_open())
+        {
+            std::ofstream outdefst("settings.json");
+            if(!outdefst.is_open()){
+                l->error("Cannot create settings.json");
+                return -1;
+            }
+            outdefst<<std::endl;
+            l->info("Created settings.json");
+        }
+            */
+        freopen("settings.json", "w", stdout);
+        std::cout<<'\n';
+        fclose(stdout);
     }
     else {
         char sn[64]{};
