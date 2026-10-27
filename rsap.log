@@ -1,0 +1,12 @@
+2026-10-27 10:02:37 [rsap.main/info] SpdLog Initalized
+2026-10-27 10:02:37 [rsap.main/info] settingsNamedat don't exist!
+2026-10-27 10:02:37 [rsap.main/info] Settings file name: settings.json
+2026-10-27 10:02:37 [worker.appstate/error] Failed to parse config settings.json: [json.exception.parse_error.101] parse error at line 2, column 1: syntax error while parsing value - unexpected end of input; expected '[', '{', or a literal
+2026-10-27 10:02:37 [worker.appstate/info] Used Def Seed
+2026-10-27 10:02:37 [worker.appstate/info] Seed: 1754669948
+2026-10-27 10:02:37 [rsap.main/info] Configurations read
+2026-10-27 10:02:37 [worker.randomSelector/info] Seed set: 1754669948
+2026-10-27 10:02:44 [worker.appstate/info] Used Def Seed
+2026-10-27 10:02:44 [worker.appstate/info] All settings saved
+2026-10-27 10:02:44 [worker.appstate/info] Used Def Seed
+2026-10-27 10:02:44 [worker.appstate/info] Seed: 1976172243

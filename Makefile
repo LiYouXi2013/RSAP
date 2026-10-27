@@ -1,33 +1,24 @@
-.PHONY: all clean run
+# ============ 平台检测 ============
+UNAME_S := $(shell uname -s 2>/dev/null)
 
-SRCS := main.cpp $(shell powershell -Command "Get-ChildItem -Recurse src -Filter *.cpp | ForEach-Object { $$_.FullName }")
+ifeq ($(OS),Windows_NT)
+    MKFILE := Makefile.win
+else ifneq (,$(filter MINGW% MSYS% CYGWIN%,$(UNAME_S)))
+    MKFILE := Makefile.win
+else ifeq ($(UNAME_S),Linux)
+    MKFILE := Makefile.linux
+else
+    $(error Unsupported platform: OS=$(OS) UNAME_S=$(UNAME_S))
+endif
 
-OBJS = $(addprefix build/, $(notdir $(SRCS:.cpp=.o)))
+# ============ 默认目标：跳转到对应平台的 all ============
+.PHONY: all clean run info FORCE
+FORCE:
 
-CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -I./include
+all:
+	@echo ">>> $(MKFILE) (all)"
+	@$(MAKE) --no-print-directory -f $(MKFILE) all
 
-LDFLAGS = -lfltk_images -lfltk_png -lfltk_z -lfltk_jpeg \
--lfltk_forms -lfltk -lcomctl32 -lws2_32 -lole32 -luuid -lgdi32 \
--lgdiplus -lwinspool -lcomdlg32 -lopengl32 -lglu32 -lwinmm \
--ladvapi32 -loleaut32 -lodbc32 -lkernel32 -luser32 \
--lwinhttp \
--static
-
-all: $(OBJS)
-	g++ -o build/main.exe $(OBJS) $(LDFLAGS)
-
-run: all
-	cd build && main.exe
-
-build/%.o: %.cpp | build
-	g++ $(CXXFLAGS) -c $< -o $@
-
-build/%.o: src/%.cpp | build
-	g++ $(CXXFLAGS) -c $< -o $@
-
-build/%.o: src/dialogs/%.cpp | build
-	g++ $(CXXFLAGS) -c $< -o $@
-
-build:
-	mkdir build
-
+# 其它目标也一并转发，方便使用
+clean run info:
+	@$(MAKE) --no-print-directory -f $(MKFILE) $@

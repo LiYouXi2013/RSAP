@@ -1,0 +1,28 @@
+.PHONY: all clean run
+
+SRCS := main.cpp src/*.cpp src/dialogs/*.cpp
+
+OBJS = $(addprefix build/, $(notdir $(SRCS:.cpp=.o)))
+
+CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -I./include
+
+LDFLAGS = -L/usr/local/lib -lfltk -lXrender -lXcursor -lXfixes -lXft -lfontconfig -lXinerama -pthread -lm -lX11 -lspdlog -lfmt
+
+all:
+	g++ -o build/main $(CXXFLAGS) $(SRCS) $(LDFLAGS)
+
+run: all
+	cd build && ./main
+
+build/%.o: %.cpp | build
+	g++ $(CXXFLAGS) -c $< -o $@
+
+build/%.o: src/%.cpp | build
+	g++ $(CXXFLAGS) -c $< -o $@
+
+build/%.o: src/dialogs/%.cpp | build
+	g++ $(CXXFLAGS) -c $< -o $@
+
+build:
+	mkdir build
+

@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "dialogs/about_dialog.h"
 #include "dialogs/general_settings_dialog.h"
 #include "dialogs/person_settings_dialog.h"
-#include <fl/platform.H>
+#include <FL/platform.H>
 #include <fstream>
 
 #ifdef _WIN32
