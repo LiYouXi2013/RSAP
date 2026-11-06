@@ -32,4 +32,5 @@ public:
     bool isDefaultSeed = false;
     bool showCons = false;
     personVec persons;
+    std::string lang="en-US";
 };

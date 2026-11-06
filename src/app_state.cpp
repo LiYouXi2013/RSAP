@@ -143,6 +143,7 @@ bool AppState::loadFromIni(const std::string& iniPathin)
     seed     = j.value("Seed", 0u);
     ast      = j.value("AST", 0);
     showCons = j.value("ShowCons", 0) != 0;
+    lang     = j.value("Language", "en-US");
 
     persons.clear();
     if (j.is_object() && j.contains("People") && j["People"].is_array()) {
