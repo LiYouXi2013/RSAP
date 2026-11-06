@@ -38,31 +38,29 @@ int main(int argc, char **argv)
     if (!settingsNamedat.is_open()) {
         l->info("settingsNamedat don't exist!");
         std::ofstream createFile("snd");
-        if (createFile.is_open())
-        {
+        if (createFile.is_open()) {
             createFile << "settings.json";
             createFile.close();
         }
         settingsName = "settings.json";
-/*
-        std::ifstream defst("settings.json");
-        if (!defst.is_open())
-        {
-            std::ofstream outdefst("settings.json");
-            if(!outdefst.is_open()){
-                l->error("Cannot create settings.json");
-                return -1;
-            }
-            outdefst<<std::endl;
-            l->info("Created settings.json");
-        }
-            */
+        /*
+                std::ifstream defst("settings.json");
+                if (!defst.is_open())
+                {
+                    std::ofstream outdefst("settings.json");
+                    if(!outdefst.is_open()){
+                        l->error("Cannot create settings.json");
+                        return -1;
+                    }
+                    outdefst<<std::endl;
+                    l->info("Created settings.json");
+                }
+                    */
         freopen("settings.json", "w", stdout);
-        std::cout<<'\n';
+        std::cout << '\n';
         fclose(stdout);
-    }
-    else {
-        char sn[64]{};
+    } else {
+        char sn[64] {};
         // 安全读取，最多读63字符
         settingsNamedat.getline(sn, sizeof(sn));
         settingsName = sn;
@@ -74,6 +72,8 @@ int main(int argc, char **argv)
     appState.loadFromIni(settingsName);
     l->info("Configurations read");
 
+    i18n localizer(appState.lang);
+
     RandomSelector selector;
     selector.setSeed(appState.seed);
     selector.setPersonList(appState.persons);
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     Fl::set_font(FL_HELVETICA_BOLD, "BConsolas");
     Fl::set_font(FL_HELVETICA_ITALIC, "Huiwen‑Fangsong");
 
-    MainWindow wnd(Fl::w() - 400, Fl::h() - 420, 300, 320, "RSAP", appState, selector, updateChecker);
+    MainWindow wnd(Fl::w() - 400, Fl::h() - 420, 300, 320, "RSAP", appState, selector, updateChecker, localizer);
     wnd.show();
     Fl::get_system_colors();
     Fl::lock();

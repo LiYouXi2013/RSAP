@@ -69,11 +69,12 @@ extern std::string settingsName;
 std::string lastSN;
 
 MainWindow::MainWindow(int X, int Y, int W, int H, const char* title,
-                       AppState& state, RandomSelector& sel, UpdateChecker& uc)
+                       AppState& state, RandomSelector& sel, UpdateChecker& uc, i18n& locallizer)
     : Fl_Double_Window(X, Y, W, H, title),
       m_appState(state),
       m_selector(sel),
-      m_updateChecker(uc)
+      m_updateChecker(uc),
+      m_localizer(locallizer)
 {
     m_disp = new RFO(0, 0, 300, 188);
     m_disp->box(FL_PLASTIC_DOWN_BOX);
@@ -82,36 +83,41 @@ MainWindow::MainWindow(int X, int Y, int W, int H, const char* title,
     m_disp->value("??");
     add(m_disp);
 
-    m_btnStart = new Fl_Button(190, 247, 86, 30, "Start");
+    m_btnStart = new Fl_Button(190, 247, 86, 30, "");
     m_btnStart->callback(cbStart, this);
     m_btnStart->box(FL_PLASTIC_UP_BOX);
     m_btnStart->down_box(FL_PLASTIC_DOWN_BOX);
     m_btnStart->labelfont(1);
+    m_btnStart->copy_label(locallizer.gt(0).c_str());
 
-    m_cbAutoStop = new Fl_Check_Button(190, 218, 86, 28, "Auto Stop");
+    m_cbAutoStop = new Fl_Check_Button(190, 218, 86, 28, "");
     m_cbAutoStop->down_box(FL_DOWN_BOX);
     m_cbAutoStop->labelfont(1);
     m_cbAutoStop->callback(cbAutoStopToggle, this);
+    m_cbAutoStop->copy_label(locallizer.gt(1).c_str());
 
     m_outputName = new Fl_Output(0, 188, 180, 60);
     m_outputName->box(FL_THIN_DOWN_BOX);
     m_outputName->textfont(FL_HELVETICA_ITALIC);
     m_outputName->textsize(60);
 
-    m_cbNoRepeat = new Fl_Check_Button(190, 197, 86, 28, "No Repeat");
+    m_cbNoRepeat = new Fl_Check_Button(190, 197, 86, 28, "");
     m_cbNoRepeat->labelfont(1);
     m_cbNoRepeat->callback(cbNoRepeatToggle, this);
+    m_cbNoRepeat->copy_label(locallizer.gt(2).c_str());
 
-    m_btnHide = new Fl_Button(220, 290, 80, 30, "Hide");
+    m_btnHide = new Fl_Button(220, 290, 80, 30, "");
     m_btnHide->labelcolor(FL_BLUE);
     m_btnHide->labelsize(30);
     m_btnHide->box(FL_FLAT_BOX);
     m_btnHide->callback(cbHide, this);
+    m_btnHide->copy_label(locallizer.gt(3).c_str());
 
-    m_btnMore = new Fl_Button(50, 263, 86, 30, "More...");
+    m_btnMore = new Fl_Button(50, 263, 86, 30, "");
     m_btnMore->box(FL_PLASTIC_UP_BOX);
     m_btnMore->labelfont(1);
     m_btnMore->callback(cbMore, this);
+    m_btnMore->copy_label(locallizer.gt(4).c_str());
 
     end();
 
@@ -119,9 +125,10 @@ MainWindow::MainWindow(int X, int Y, int W, int H, const char* title,
     m_floatWnd = new Fl_Double_Window(Fl::w(), Fl::h(), 36, 36, "");
     m_floatWnd->set_modal();
     m_floatWnd->border(0);
-    Fl_Button* showBtn = new Fl_Button(0, 0, 36, 36, "Show");
+    Fl_Button* showBtn = new Fl_Button(0, 0, 36, 36, "");
     showBtn->box(FL_PLASTIC_UP_BOX);
     showBtn->callback(cbFloatShow, this);
+    showBtn->copy_label(locallizer.gt(5).c_str());
     m_floatWnd->end();
 
     Fl::repeat_timeout(0.5, staticKeepOnTop, this);
@@ -162,11 +169,11 @@ void MainWindow::doARoll()
     m_cc--;
     if (m_cc > 0) {
         Fl::repeat_timeout(0.1, staticDoARoll, this);
-        std::string lab = "Stop\nLeft: " + std::to_string(m_cc);
+        std::string lab = m_localizer.gt(5) + std::to_string(m_cc);
         m_btnStart->copy_label(lab.c_str());
     } else {
         m_isRolling = false;
-        m_btnStart->copy_label("Start");
+        m_btnStart->copy_label(m_localizer.gt(0).c_str());
     }
 }
 
@@ -175,7 +182,7 @@ void MainWindow::startRoll()
     if (m_isRolling) {
         m_isRolling = false;
         Fl::remove_timeout(staticDoARoll, this);
-        m_btnStart->copy_label("Start");
+        m_btnStart->copy_label(m_localizer.gt(0).c_str());
         return;
     }
     if (!m_autoStop) {
@@ -184,7 +191,7 @@ void MainWindow::startRoll()
         try {
             m_outputName->value(m_selector.getPersonList().at(ii).name.c_str());
         } catch (...) {
-            m_outputName->value("   ??   ");
+            m_outputName->value(m_localizer.gt(6).c_str());
         }
         m_outputName->redraw();
     } else {
@@ -217,22 +224,28 @@ void MainWindow::openMoreDialog()
     Fl_Double_Window moreWnd(x() - 100, y() - 100, 220, 330);
     moreWnd.set_modal();
 
-    Fl_Group* grpSet = new Fl_Group(0, 15, 220, 92, "Settings");
+    Fl_Group* grpSet = new Fl_Group(0, 15, 220, 92, "");
     grpSet->box(FL_SHADOW_FRAME);
     grpSet->labelfont(1);
-    Fl_Button* btnGen = new Fl_Button(10, 25, 58, 28, "General");
-    Fl_Button* btnPer = new Fl_Button(10, 69, 58, 28, "Person");
+    grpSet->copy_label(m_localizer.gt(7).c_str());
+    Fl_Button* btnGen = new Fl_Button(10, 25, 58, 28, "");
+    btnGen->copy_label(m_localizer.gt(8).c_str());
+    Fl_Button* btnPer = new Fl_Button(10, 69, 58, 28, "");
+    btnPer->copy_label(m_localizer.gt(9).c_str());
     btnGen->box(FL_PLASTIC_UP_BOX);
     btnPer->box(FL_PLASTIC_UP_BOX);
     grpSet->end();
 
-    Fl_Input *inputSettingsFileNameInput = new Fl_Input(100, 263, 120, 22, "Settings \\\nFile Name/");
+    Fl_Input *inputSettingsFileNameInput = new Fl_Input(100, 263, 120, 22, "");
     inputSettingsFileNameInput->value(settingsName.c_str());
+    inputSettingsFileNameInput->copy_label(m_localizer.gt(10).c_str());
 
-    Fl_Button* btnAbout = new Fl_Button(60, 293, 64, 22, "About");
+    Fl_Button* btnAbout = new Fl_Button(60, 293, 64, 22, "");
     btnAbout->box(FL_PLASTIC_UP_BOX);
-    Fl_Button* btnOk = new Fl_Button(141, 293, 64, 22, "OK");
+    btnAbout->copy_label(m_localizer.gt(11).c_str());
+    Fl_Button* btnOk = new Fl_Button(141, 293, 64, 22, "");
     btnOk->box(FL_PLASTIC_UP_BOX);
+    btnOk->copy_label(m_localizer.gt(12).c_str());
 
     btnGen->callback([](Fl_Widget*, void* ud) {
         auto* p = reinterpret_cast<MainWindow *>(ud);

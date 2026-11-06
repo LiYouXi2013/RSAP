@@ -25,12 +25,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "app_state.h"
 #include "random_selector.h"
 #include "update_checker.h"
+#include "i18n.h"
 
 class MainWindow : public Fl_Double_Window
 {
 public:
     MainWindow(int X, int Y, int W, int H, const char* title,
-               AppState& state, RandomSelector& sel, UpdateChecker& uc);
+               AppState& state, RandomSelector& sel, UpdateChecker& uc, i18n& localizer);
     ~MainWindow() override = default;
 
     static void staticKeepOnTop(void* ud);
@@ -60,6 +61,7 @@ private:
     AppState &m_appState;
     RandomSelector &m_selector;
     UpdateChecker &m_updateChecker;
+    i18n &m_localizer;
 
     bool m_isRolling = false;
     bool m_autoStop = false;
