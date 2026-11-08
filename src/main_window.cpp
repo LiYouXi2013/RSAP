@@ -128,7 +128,7 @@ MainWindow::MainWindow(int X, int Y, int W, int H, const char* title,
     Fl_Button* showBtn = new Fl_Button(0, 0, 36, 36, "");
     showBtn->box(FL_PLASTIC_UP_BOX);
     showBtn->callback(cbFloatShow, this);
-    showBtn->copy_label(locallizer.gt(5).c_str());
+    showBtn->copy_label(locallizer.gt(6).c_str());
     m_floatWnd->end();
 
     Fl::repeat_timeout(0.5, staticKeepOnTop, this);
