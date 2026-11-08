@@ -74,3 +74,4 @@ std::shared_ptr<spdlog::logger> get_logger(const std::string& name)
     }
     return l;
 }
+

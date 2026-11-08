@@ -128,9 +128,9 @@ bool AppState::loadFromIni(const std::string& iniPathin)
         if (!f.is_open()) {
             l->warn("Config file not found: {}", iniPathin);
             freopen("settings.json", "w", stdout);
-            std::cout<<'\n';
+            std::cout << '\n';
             fclose(stdout);
-        } 
+        }
 
         try {
             f >> j;
@@ -141,7 +141,7 @@ bool AppState::loadFromIni(const std::string& iniPathin)
     }
 
     seed     = j.value("Seed", 0u);
-    ast      = j.value("AST", 0);
+    ast      = j.value("AST", 1500);
     showCons = j.value("ShowCons", 0) != 0;
     lang     = j.value("Language", "en-US");
 
@@ -185,6 +185,7 @@ bool AppState::saveToIni(const std::string& iniPathin)
     j["Seed"]     = isDefaultSeed ? 0u : seed;
     j["AST"]      = static_cast<uint32_t>(ast);
     j["ShowCons"] = static_cast<int>(showCons);
+    j["Language"] = lang;
 
     j["People"] = json::array();
     for (const auto& p : persons) {

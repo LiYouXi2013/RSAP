@@ -20,8 +20,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "dialogs/about_dialog.h"
 #include "dialogs/general_settings_dialog.h"
 #include "dialogs/person_settings_dialog.h"
+#include <FL/Fl_Input_Choice.H>
 #include <FL/platform.H>
 #include <fstream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 #ifdef _WIN32
 #include <windows.h>
@@ -219,6 +223,8 @@ void MainWindow::restoreFromFloat()
 
 void MainWindow::openMoreDialog()
 {
+    auto l = get_logger("ui.morewnd");
+
     lastSN = settingsName;
     Fl::remove_timeout(staticKeepOnTop, this);
     Fl_Double_Window moreWnd(x() - 100, y() - 100, 220, 330);
@@ -236,9 +242,25 @@ void MainWindow::openMoreDialog()
     btnPer->box(FL_PLASTIC_UP_BOX);
     grpSet->end();
 
-    Fl_Input *inputSettingsFileNameInput = new Fl_Input(100, 263, 120, 22, "");
+    Fl_Input_Choice *inputSettingsFileNameInput = new Fl_Input_Choice(100, 263, 120, 22, "");
     inputSettingsFileNameInput->value(settingsName.c_str());
     inputSettingsFileNameInput->copy_label(m_localizer.gt(10).c_str());
+
+    std::string targetExt = ".json";
+
+    for (const auto& entry : fs::directory_iterator(".")) {
+        if (entry.is_regular_file()) {
+            std::string e = entry.path().extension().string();
+            std::string a = e, b = targetExt;
+            std::transform(a.begin(), a.end(), a.begin(), ::tolower);
+            std::transform(b.begin(), b.end(), b.begin(), ::tolower);
+            if (a == b) {
+                std::string namen = entry.path().filename().string();
+                inputSettingsFileNameInput->add(namen.c_str());
+                l->info("Added {}", namen);
+            }
+        }
+    }
 
     Fl_Button* btnAbout = new Fl_Button(60, 293, 64, 22, "");
     btnAbout->box(FL_PLASTIC_UP_BOX);
