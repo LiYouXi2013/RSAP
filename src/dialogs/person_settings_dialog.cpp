@@ -67,7 +67,7 @@ namespace PersonSettingsDialog
         wnd->hide();
     }
 
-    void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel)
+    void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel, i18n& tr)
     {
         int px = parent ? parent->x() - 100 : 100;
         int py = parent ? parent->y() - 100 : 100;
@@ -86,7 +86,7 @@ namespace PersonSettingsDialog
         et.set_data(etVec);
 
         et.set_col_headers({
-            "Name", "Weight"
+            tr.gt(20).c_str(), tr.gt(21).c_str()
         });
 
         et.set_cb([&ctx](int R, int C, Fl_Table::TableContext tctx) {
@@ -113,25 +113,31 @@ namespace PersonSettingsDialog
         ctx.etable = &et;
 
 
-        Fl_Button *add_btn = new Fl_Button(290, 30, 64, 20, "Add");
+        Fl_Button *add_btn = new Fl_Button(290, 30, 64, 20, "");
         add_btn->callback([](Fl_Widget*, void* ud) {
             Ctx* ctx = (Ctx*)ud;
             ctx->etable->add_row({"无名氏", "1"});
         }, &ctx);
-        Fl_Button *remove_btn = new Fl_Button(290, 70, 64, 20, "Remove");
+        add_btn->copy_label(tr.gt(22).c_str());
+
+        Fl_Button *remove_btn = new Fl_Button(290, 70, 64, 20, "");
         remove_btn->deactivate();
         remove_btn->callback([](Fl_Widget*, void* ud) {
             Ctx* ctx = (Ctx*)ud;
             ctx->etable->remove_row(ctx->etable->getSelRow());
             ctx->rm_btn->deactivate();
         }, &ctx);
+        remove_btn->copy_label(tr.gt(23).c_str());
+
         ctx.add_btn = add_btn;
         ctx.rm_btn = remove_btn;
 
-        Fl_Button *ok = new Fl_Button(290, 110, 64, 20, "OK");
+        Fl_Button *ok = new Fl_Button(290, 110, 64, 20, "");
         ok->callback(cbOk, &ctx);
+        ok->copy_label(tr.gt(18).c_str());
         Fl_Button *cancel = new Fl_Button(290, 150, 64, 20, "Cancel");
         cancel->callback(cbCancel, &wnd);
+        cancel->copy_label(tr.gt(19).c_str());
 
         wnd.end();
         wnd.show();

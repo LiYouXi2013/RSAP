@@ -21,8 +21,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "app_state.h"
 #include "random_selector.h"
 #include "update_checker.h"
+#include "i18n.h"
 
 namespace GeneralSettingsDialog
 {
-    void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel, UpdateChecker& uc);
+    void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel, UpdateChecker& uc, i18n& tr);
 }

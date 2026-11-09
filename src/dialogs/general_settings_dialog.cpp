@@ -150,7 +150,7 @@ namespace GeneralSettingsDialog
         ctx->wnd->hide();
     }
 
-    void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel, UpdateChecker& uc)
+    void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel, UpdateChecker& uc, i18n& tr)
     {
         int px = parent ? parent->x() - 100 : 100;
         int py = parent ? parent->y() - 100 : 100;
@@ -161,10 +161,11 @@ namespace GeneralSettingsDialog
         DialogCtx ctx{state, stateToBeChanged, sel, uc};
         ctx.wnd = &wnd;
 
-        ctx.viAst = new VI(151, 10, 64, 22, "Auto Stop Time:");
+        ctx.viAst = new VI(151, 10, 64, 22, "");
         ctx.viAst->value(state.ast);
-
-        new Fl_Box(42, 45, 148, 20, "Random Seed");
+        ctx.viAst->copy_label(tr.gt(14).c_str());
+        Fl_Box* rsb = new Fl_Box(42, 45, 148, 20, "");
+        rsb->copy_label(tr.gt(15).c_str());
         ctx.viSeed = new VI(42, 65, 148, 22, "");
         ctx.viSeed->value(state.seed);
         ctx.viSeed->callback([](Fl_Widget * a, void* ud) {
@@ -177,22 +178,26 @@ namespace GeneralSettingsDialog
             }
         }, &ctx);
 
-        Fl_Button* btnCheck = new Fl_Button(43, 95, 155, 20, "Check for Update");
+        Fl_Button* btnCheck = new Fl_Button(43, 95, 155, 20, "");
         btnCheck->callback(cbCheckUpdate, &ctx);
+        btnCheck->copy_label(tr.gt(16).c_str());
 
-        Fl_Check_Button* btnHideConsole = new Fl_Check_Button(42, 125, 148, 22, "Show Console");
+        Fl_Check_Button* btnHideConsole = new Fl_Check_Button(42, 125, 148, 22, "");
         btnHideConsole->value(state.showCons);
         btnHideConsole->callback([](Fl_Widget * a, void*) {
             ShowHideConsole(GetConsoleWindowHandle(), ((Fl_Check_Button*)a)->value());
         });
+        btnHideConsole->copy_label(tr.gt(17).c_str());
 
         ctx.btnHideCons = btnHideConsole;
 
-        Fl_Button* btnOk = new Fl_Button(127, 153, 64, 20, "OK");
+        Fl_Button* btnOk = new Fl_Button(127, 153, 64, 20, "");
         btnOk->callback(cbOk, &ctx);
+        btnOk->copy_label(tr.gt(18).c_str());
 
-        Fl_Button* btnCancel = new Fl_Button(42, 153, 64, 20, "Cancel");
-        btnCancel->callback(cbCancel, &wnd);
+        Fl_Button* btnCancel = new Fl_Button(42, 153, 64, 20, "");
+        btnCancel->callback(cbCancel, &ctx);
+        btnCancel->copy_label(tr.gt(19).c_str());
 
         wnd.end();
         wnd.show();

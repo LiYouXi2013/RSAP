@@ -20,8 +20,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <FL/Fl_Window.H>
 #include "app_state.h"
 #include "random_selector.h"
+#include "i18n.h"
 
 namespace PersonSettingsDialog
 {
-    void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel);
+    void showModal(Fl_Window* parent, AppState& state, RandomSelector& sel, i18n& tr);
 }

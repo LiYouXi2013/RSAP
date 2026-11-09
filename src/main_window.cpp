@@ -271,12 +271,12 @@ void MainWindow::openMoreDialog()
 
     btnGen->callback([](Fl_Widget*, void* ud) {
         auto* p = reinterpret_cast<MainWindow *>(ud);
-        GeneralSettingsDialog::showModal(p, p->m_appState, p->m_selector, p->m_updateChecker);
+        GeneralSettingsDialog::showModal(p, p->m_appState, p->m_selector, p->m_updateChecker, p->m_localizer);
     }, this);
 
     btnPer->callback([](Fl_Widget*, void* ud) {
         auto* p = reinterpret_cast<MainWindow *>(ud);
-        PersonSettingsDialog::showModal(p, p->m_appState, p->m_selector);
+        PersonSettingsDialog::showModal(p, p->m_appState, p->m_selector, p->m_localizer);
     }, this);
 
     inputSettingsFileNameInput->callback([](Fl_Widget * wg, void* ud) {
