@@ -339,10 +339,6 @@ void MainWindow::openMoreDialog()
             createFile.close();
         }
 
-        if (tmpLang != p->mainwnd->m_appState.lang) {
-            fl_alert(p->mainwnd->m_localizer.gt(25).c_str());
-        }
-
         p->more.hide();
     }, &upo);
 
