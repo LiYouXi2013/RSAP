@@ -13,8 +13,12 @@ LDFLAGS = -lfltk_images -lfltk_png -lfltk_z -lfltk_jpeg \
 -lwinhttp \
 -static
 
-all: $(OBJS)
+all: $(OBJS) lang
+	copy /Y lang\*.json "build\lang\"
 	g++ -o build/main.exe $(OBJS) $(LDFLAGS)
+
+lang:
+	mkdir build\lang
 
 run: all
 	cd build && main.exe

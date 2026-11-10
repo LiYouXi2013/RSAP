@@ -58,6 +58,8 @@ private:
     int m_winX = 0;
     int m_winY = 0;
 
+    std::string tmplang;
+
     AppState &m_appState;
     RandomSelector &m_selector;
     UpdateChecker &m_updateChecker;
