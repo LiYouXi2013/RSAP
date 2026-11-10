@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 
     Fl::set_font(FL_HELVETICA, "Consolas");
     Fl::set_font(FL_HELVETICA_BOLD, "BConsolas");
-    Fl::set_font(FL_HELVETICA_ITALIC, "Huiwen‑Fangsong");
+    Fl::set_font(FL_HELVETICA_ITALIC, "Microsoft Yahei");
 
     MainWindow wnd(Fl::w() - 400, Fl::h() - 420, 300, 320, "RSAP", appState, selector, updateChecker, localizer);
     wnd.show();

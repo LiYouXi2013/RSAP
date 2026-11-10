@@ -25,6 +25,7 @@
         "Weight",
         "Add",
         "Remove",
-        "Language"
+        "Language",
+        "You should restart RSAP after changing language."
     ]
 }

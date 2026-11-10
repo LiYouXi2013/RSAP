@@ -6,6 +6,27 @@
 
 using json = nlohmann::json;
 
+std::string getLangName(std::string lang)
+{
+    json j;
+    {
+        std::ifstream f(lang);
+        if (!f.is_open()) {
+            freopen(std::string(lang).c_str(), "w", stdout);
+            std::cout << '\n';
+            fclose(stdout);
+        }
+
+        try {
+            f >> j;
+        } catch (const std::exception& e) {
+            j = json::object();
+        }
+    }
+
+    return j.value("LangName", "NoName");
+}
+
 i18n::i18n(std::string selLang)
 {
     auto l = get_logger("worker.i18n");
@@ -27,8 +48,6 @@ i18n::i18n(std::string selLang)
             j = json::object();
         }
     }
-
-    cuLangName = j.value("LangName", "NoName");
 
     if (j.is_object() && j.contains("Translations") && j["Translations"].is_array()) {
         const auto& transArray = j["Translations"];

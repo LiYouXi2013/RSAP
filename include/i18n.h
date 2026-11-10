@@ -2,10 +2,11 @@
 #include <string>
 #include <vector>
 
+std::string getLangName(std::string lang);
+
 class i18n
 {
 private:
-    std::string cuLang, cuLangName;
     std::vector<std::string> texts;
 
 public:

@@ -23,10 +23,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Choice.H>
 #include <FL/platform.H>
+#include <FL/fl_ask.H>
 #include <fstream>
 #include <filesystem>
 
 namespace fs = std::filesystem;
+
+std::string tmpLang;
 
 #ifdef _WIN32
 #include <windows.h>
@@ -150,13 +153,11 @@ void MainWindow::staticKeepOnTop(void *ud)
 void MainWindow::keepOnTop()
 {
     NativeHandle hwnd = fl_xid(this);
-    if (hwnd)
-    {
+    if (hwnd) {
         SetWindowTopmost(hwnd, 1);
     }
     NativeHandle hwnd2 = fl_xid(m_floatWnd);
-    if (hwnd2)
-    {
+    if (hwnd2) {
         SetWindowTopmost(hwnd2, 1);
     }
     Fl::repeat_timeout(0.5, staticKeepOnTop, this);
@@ -176,14 +177,11 @@ void MainWindow::doARoll()
     m_outputName->value(m_selector.getPersonList()[ii].name.c_str());
     m_outputName->redraw();
     m_cc--;
-    if (m_cc > 0)
-    {
+    if (m_cc > 0) {
         Fl::repeat_timeout(0.1, staticDoARoll, this);
         std::string lab = m_localizer.gt(5) + std::to_string(m_cc);
         m_btnStart->copy_label(lab.c_str());
-    }
-    else
-    {
+    } else {
         m_isRolling = false;
         m_btnStart->copy_label(m_localizer.gt(0).c_str());
     }
@@ -191,29 +189,22 @@ void MainWindow::doARoll()
 
 void MainWindow::startRoll()
 {
-    if (m_isRolling)
-    {
+    if (m_isRolling) {
         m_isRolling = false;
         Fl::remove_timeout(staticDoARoll, this);
         m_btnStart->copy_label(m_localizer.gt(0).c_str());
         return;
     }
-    if (!m_autoStop)
-    {
+    if (!m_autoStop) {
         int ii = m_selector.randomPick();
         m_disp->value(std::to_string(ii + 1).c_str());
-        try
-        {
+        try {
             m_outputName->value(m_selector.getPersonList().at(ii).name.c_str());
-        }
-        catch (...)
-        {
+        } catch (...) {
             m_outputName->value(m_localizer.gt(6).c_str());
         }
         m_outputName->redraw();
-    }
-    else
-    {
+    } else {
         m_cc = static_cast<int>(m_appState.ast / 100);
         Fl::add_timeout(0, staticDoARoll, this);
     }
@@ -263,16 +254,13 @@ void MainWindow::openMoreDialog()
 
     std::string targetExt = ".json";
 
-    for (const auto &entry : fs::directory_iterator("."))
-    {
-        if (entry.is_regular_file())
-        {
+    for (const auto &entry : fs::directory_iterator(".")) {
+        if (entry.is_regular_file()) {
             std::string e = entry.path().extension().string();
             std::string a = e, b = targetExt;
             std::transform(a.begin(), a.end(), a.begin(), tolower);
             std::transform(b.begin(), b.end(), b.begin(), tolower);
-            if (a == b)
-            {
+            if (a == b) {
                 std::string namen = entry.path().filename().string();
                 inputSettingsFileNameInput->add(namen.c_str());
                 l->info("Added Settings File: {}", namen);
@@ -280,28 +268,29 @@ void MainWindow::openMoreDialog()
         }
     }
 
-    Fl_Input_Choice *langChooser = new Fl_Input_Choice(100, 233, 120, 22, "");
-    langChooser->value(std::string(m_appState.lang+".json").c_str());
+    std::vector<std::string> nameMap;
+
+    Fl_Choice *langChooser = new Fl_Choice(100, 233, 120, 22, "");
     langChooser->copy_label(m_localizer.gt(24).c_str());
-    langChooser->callback([](Fl_Widget*,void*){
+    langChooser->callback([](Fl_Widget * a, void* ud) {
+        Fl_Choice *ll = (Fl_Choice*)a;
+        std::vector<std::string> *nameMap = (std::vector<std::string> *)ud;
+        tmpLang = nameMap->at(ll->value());
+    }, &nameMap);
 
-    });
+    int i = 0;
+    for (const auto &entry : fs::directory_iterator("./lang/")) {
+        if (entry.is_regular_file()) {
+            langChooser->add(getLangName(entry.path().string().c_str()).c_str());
 
-    for (const auto &entry : fs::directory_iterator("./lang/"))
-    {
-        if (entry.is_regular_file())
-        {
-            std::string e = entry.path().extension().string();
-            std::string a = e, b = targetExt;
-            std::transform(a.begin(), a.end(), a.begin(), tolower);
-            std::transform(b.begin(), b.end(), b.begin(), tolower);
-            if (a == b)
-            {
-                std::string namen = entry.path().filename().string();
-                langChooser->add(namen.c_str());
-                l->info("Added Language: {}", namen);
+            if (m_appState.lang == entry.path().stem().string()) {
+                langChooser->value(i);
             }
+
+            nameMap.push_back(entry.path().stem().string());
         }
+
+        i++;
     }
 
     Fl_Button *btnAbout = new Fl_Button(60, 293, 64, 22, "");
@@ -311,37 +300,36 @@ void MainWindow::openMoreDialog()
     btnOk->box(FL_PLASTIC_UP_BOX);
     btnOk->copy_label(m_localizer.gt(12).c_str());
 
-    btnGen->callback([](Fl_Widget *, void *ud)
-                     {
+    btnGen->callback([](Fl_Widget *, void *ud) {
         auto* p = reinterpret_cast<MainWindow *>(ud);
-        GeneralSettingsDialog::showModal(p, p->m_appState, p->m_selector, p->m_updateChecker, p->m_localizer); }, this);
+        GeneralSettingsDialog::showModal(p, p->m_appState, p->m_selector, p->m_updateChecker, p->m_localizer);
+    }, this);
 
-    btnPer->callback([](Fl_Widget *, void *ud)
-                     {
+    btnPer->callback([](Fl_Widget *, void *ud) {
         auto* p = reinterpret_cast<MainWindow *>(ud);
-        PersonSettingsDialog::showModal(p, p->m_appState, p->m_selector, p->m_localizer); }, this);
+        PersonSettingsDialog::showModal(p, p->m_appState, p->m_selector, p->m_localizer);
+    }, this);
 
-    inputSettingsFileNameInput->callback([](Fl_Widget *wg, void *ud)
-                                         {
+    inputSettingsFileNameInput->callback([](Fl_Widget * wg, void *ud) {
         MainWindow* p = reinterpret_cast<MainWindow *>(ud);
         Fl_Input* ipt = (Fl_Input*)wg;
-        settingsName = ipt->value(); }, this);
+        settingsName = ipt->value();
+    }, this);
 
-    btnAbout->callback([](Fl_Widget *, void *ud)
-                       {
+    btnAbout->callback([](Fl_Widget *, void *ud) {
         auto* p = reinterpret_cast<MainWindow *>(ud);
-        AboutDialog::showModal(p); }, this);
+        AboutDialog::showModal(p);
+    }, this);
 
-    struct uploadOK
-    {
+    struct uploadOK {
         MainWindow *mainwnd;
         Fl_Double_Window &more;
     };
     uploadOK upo{this, moreWnd};
 
-    btnOk->callback([](Fl_Widget *, void *ud)
-                    {
+    btnOk->callback([](Fl_Widget *, void *ud) {
         auto* p = reinterpret_cast<uploadOK *>(ud);
+        p->mainwnd->m_appState.lang = tmpLang;
         p->mainwnd->m_appState.saveToIni(lastSN);
         p->mainwnd->m_appState.loadFromIni(settingsName);
 
@@ -351,7 +339,12 @@ void MainWindow::openMoreDialog()
             createFile.close();
         }
 
-        p->more.hide(); }, &upo);
+        if (tmpLang != p->mainwnd->m_appState.lang) {
+            fl_alert(p->mainwnd->m_localizer.gt(25).c_str());
+        }
+
+        p->more.hide();
+    }, &upo);
 
     moreWnd.end();
     moreWnd.show();
