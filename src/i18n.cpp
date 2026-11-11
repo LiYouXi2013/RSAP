@@ -11,12 +11,6 @@ std::string getLangName(std::string lang)
     json j;
     {
         std::ifstream f(lang);
-        if (!f.is_open()) {
-            freopen(std::string(lang).c_str(), "w", stdout);
-            std::cout << '\n';
-            fclose(stdout);
-        }
-
         try {
             f >> j;
         } catch (const std::exception& e) {
@@ -34,13 +28,6 @@ i18n::i18n(std::string selLang)
     json j;
     {
         std::ifstream f("./lang/" + selLang + ".json");
-        if (!f.is_open()) {
-            l->warn("Language not found: {}", selLang);
-            freopen(std::string("./lang/" + selLang + ".json").c_str(), "w", stdout);
-            std::cout << '\n';
-            fclose(stdout);
-        }
-
         try {
             f >> j;
         } catch (const std::exception& e) {

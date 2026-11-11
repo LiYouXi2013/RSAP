@@ -89,7 +89,9 @@ void EditableTable::remove_row(int index)
         edit_row = edit_col = -1;
     } else if (edit_row > index) {
         edit_row--;
-    }
+    } 
+
+    selected_row = -1;
 
     data.erase(data.begin() + index);
     rows((int)data.size());

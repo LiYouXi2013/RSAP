@@ -231,6 +231,7 @@ void MainWindow::openMoreDialog()
 {
     auto l = get_logger("ui.morewnd");
 
+    tmpLang = m_appState.lang;
     lastSN = settingsName;
     Fl::remove_timeout(staticKeepOnTop, this);
     Fl_Double_Window moreWnd(x() - 100, y() - 100, 220, 330);
@@ -329,6 +330,9 @@ void MainWindow::openMoreDialog()
 
     btnOk->callback([](Fl_Widget *, void *ud) {
         auto* p = reinterpret_cast<uploadOK *>(ud);
+        if (p->mainwnd->m_appState.lang != tmpLang){
+            fl_alert(p->mainwnd->m_localizer.gt(25).c_str());
+        }
         p->mainwnd->m_appState.lang = tmpLang;
         p->mainwnd->m_appState.saveToIni(lastSN);
         p->mainwnd->m_appState.loadFromIni(settingsName);

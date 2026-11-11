@@ -25,7 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <fstream>
 
 std::string settingsName = "settings.json";
-unsigned long long localVer{10};
+unsigned long long localVer{12};
 
 int main(int argc, char **argv)
 {
