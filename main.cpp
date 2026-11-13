@@ -23,7 +23,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "update_checker.h"
 #include <FL/Fl.H>
 #include <fstream>
+#include <nlohmann/json.hpp>
 
+using json = nlohmann::json;
 std::string settingsName = "settings.json";
 unsigned long long localVer{12};
 
@@ -34,38 +36,25 @@ int main(int argc, char **argv)
     auto l = get_logger("rsap.main");
     l->info("SpdLog Initalized");
 
-    std::fstream settingsNamedat("snd", std::ios::in | std::ios::out);
-    if (!settingsNamedat.is_open()) {
-        l->info("settingsNamedat don't exist!");
-        std::ofstream createFile("snd");
-        if (createFile.is_open()) {
-            createFile << "settings.json";
-            createFile.close();
+    json j;
+    {
+        std::ifstream f("snd");
+        if (!f.is_open()) {
+            l->warn("SND file not found");
+            freopen("snd", "w", stdout);
+            std::cout << '\n';
+            fclose(stdout);
         }
-        settingsName = "settings.json";
-        /*
-                std::ifstream defst("settings.json");
-                if (!defst.is_open())
-                {
-                    std::ofstream outdefst("settings.json");
-                    if(!outdefst.is_open()){
-                        l->error("Cannot create settings.json");
-                        return -1;
-                    }
-                    outdefst<<std::endl;
-                    l->info("Created settings.json");
-                }
-                    */
-        freopen("settings.json", "w", stdout);
-        std::cout << '\n';
-        fclose(stdout);
-    } else {
-        char sn[64] {};
-        // 安全读取，最多读63字符
-        settingsNamedat.getline(sn, sizeof(sn));
-        settingsName = sn;
-        settingsNamedat.close();
+
+        try {
+            f >> j;
+        } catch (const std::exception& e) {
+            l->error("Failed to parse SND: {}", e.what());
+            j = json::object();
+        }
     }
+    settingsName = j["SettingsName"];
+
     l->info("Settings file name: {}", settingsName);
 
     AppState appState;

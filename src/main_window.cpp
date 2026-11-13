@@ -26,7 +26,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <FL/fl_ask.H>
 #include <fstream>
 #include <filesystem>
+#include <nlohmann/json.hpp>
 
+using json = nlohmann::json;
 namespace fs = std::filesystem;
 
 std::string tmpLang;
@@ -337,11 +339,14 @@ void MainWindow::openMoreDialog()
         p->mainwnd->m_appState.saveToIni(lastSN);
         p->mainwnd->m_appState.loadFromIni(settingsName);
 
-        std::ofstream createFile("snd");
-        if (createFile.is_open()) {
-            createFile << settingsName;
-            createFile.close();
+        json j;
+        j["SettingsName"] = settingsName;
+        std::ofstream f("snd");
+        if (!f.is_open()) {
+            l->error("Failed to open SND for writing: {}");
+            return false;
         }
+        f << j.dump(4) << '\n';
 
         p->more.hide();
     }, &upo);
