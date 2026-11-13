@@ -53,8 +53,12 @@ int main(int argc, char **argv)
             j = json::object();
         }
     }
-    settingsName = j["SettingsName"];
 
+    try {
+        settingsName = j["SettingsName"];
+    } catch (...) {
+        settingsName = "settings.json";
+    }
     l->info("Settings file name: {}", settingsName);
 
     AppState appState;
@@ -71,7 +75,7 @@ int main(int argc, char **argv)
 
     Fl::set_font(FL_HELVETICA, "Consolas");
     Fl::set_font(FL_HELVETICA_BOLD, "BConsolas");
-    Fl::set_font(FL_HELVETICA_ITALIC, "Microsoft Yahei");
+    Fl::set_font(FL_TIMES, "Huiwen-Fangsong");
 
     MainWindow wnd(Fl::w() - 400, Fl::h() - 420, 300, 320, "RSAP", appState, selector, updateChecker, localizer);
     wnd.show();

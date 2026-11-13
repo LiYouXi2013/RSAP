@@ -26,6 +26,7 @@
         "Add",
         "Remove",
         "Language",
-        "You should restart RSAP after changing language."
+        "You should restart RSAP after changing language.",
+        "No one to be picked"
     ]
 }

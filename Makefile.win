@@ -15,7 +15,8 @@ LDFLAGS = -lfltk_images -lfltk_png -lfltk_z -lfltk_jpeg \
 
 all: $(OBJS) lang
 	copy /Y lang\*.json "build\lang\"
-	g++ -o build/main.exe $(OBJS) $(LDFLAGS)
+	windres app_icon.rc -O coff -o build/app_icon.o
+	g++ -o build/main.exe $(OBJS) build/app_icon.o $(LDFLAGS)
 
 lang:
 	mkdir build\lang

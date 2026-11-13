@@ -110,7 +110,7 @@ MainWindow::MainWindow(int X, int Y, int W, int H, const char *title,
 
     m_outputName = new Fl_Output(0, 188, 180, 60);
     m_outputName->box(FL_THIN_DOWN_BOX);
-    m_outputName->textfont(FL_HELVETICA_ITALIC);
+    m_outputName->textfont(FL_TIMES);
     m_outputName->textsize(60);
 
     m_cbNoRepeat = new Fl_Check_Button(190, 197, 86, 28, "");
@@ -130,6 +130,10 @@ MainWindow::MainWindow(int X, int Y, int W, int H, const char *title,
     m_btnMore->labelfont(1);
     m_btnMore->callback(cbMore, this);
     m_btnMore->copy_label(locallizer.gt(4).c_str());
+#ifdef _WIN32
+#include <windows.h>
+    icon((const void *)LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(1)));
+#endif
 
     end();
 
@@ -203,7 +207,7 @@ void MainWindow::startRoll()
         try {
             m_outputName->value(m_selector.getPersonList().at(ii).name.c_str());
         } catch (...) {
-            m_outputName->value(m_localizer.gt(6).c_str());
+            m_outputName->value(m_localizer.gt(26).c_str());
         }
         m_outputName->redraw();
     } else {
@@ -315,7 +319,7 @@ void MainWindow::openMoreDialog()
 
     inputSettingsFileNameInput->callback([](Fl_Widget * wg, void *ud) {
         MainWindow* p = reinterpret_cast<MainWindow *>(ud);
-        Fl_Input* ipt = (Fl_Input*)wg;
+        Fl_Input_Choice* ipt = (Fl_Input_Choice*)wg;
         settingsName = ipt->value();
     }, this);
 
@@ -331,6 +335,7 @@ void MainWindow::openMoreDialog()
     uploadOK upo{this, moreWnd};
 
     btnOk->callback([](Fl_Widget *, void *ud) {
+        auto l = get_logger("ui.morewnd.onOk");
         auto* p = reinterpret_cast<uploadOK *>(ud);
         if (p->mainwnd->m_appState.lang != tmpLang){
             fl_alert(p->mainwnd->m_localizer.gt(25).c_str());
@@ -344,9 +349,11 @@ void MainWindow::openMoreDialog()
         std::ofstream f("snd");
         if (!f.is_open()) {
             l->error("Failed to open SND for writing: {}");
-            return false;
+            return;
         }
         f << j.dump(4) << '\n';
+
+        p->mainwnd->m_selector.setPersonList(p->mainwnd->m_appState.persons);
 
         p->more.hide();
     }, &upo);
