@@ -27,7 +27,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using json = nlohmann::json;
 std::string settingsName = "settings.json";
-unsigned long long localVer{11};
+unsigned long long localVer{12};
 
 int main(int argc, char **argv)
 {
