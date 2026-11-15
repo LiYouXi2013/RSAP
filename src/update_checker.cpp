@@ -36,7 +36,7 @@ void UpdateChecker::awakeCb(void* ud)
             if (fl_ask("Found a newer version: %llu \n "
                        "Would you like to open the release page? \n"
                        "  Password: 1234", self->info.remoteVer)) {
-                system("start https://liyouxi2013.github.io/RSAP/downloads.html");
+                system("start https://rsap.devs.li/RSAP/downloads.html");
             }
         }
     }
@@ -46,7 +46,7 @@ void UpdateChecker::awakeCb(void* ud)
 void UpdateChecker::workThread()
 {
     DWORD err = 0;
-    std::string body = httpGet(L"liyouxi2013.github.io", L"/rsapver.txt", err);
+    std::string body = httpGet(L"rsap.devs.li", L"/rsapver.txt", err);
     if (body.empty()) {
         info.ok = false;
         Fl::awake(awakeCb, this);
