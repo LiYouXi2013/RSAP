@@ -184,7 +184,7 @@ void MainWindow::doARoll()
     m_outputName->redraw();
     m_cc--;
     if (m_cc > 0) {
-        Fl::repeat_timeout(0.1, staticDoARoll, this);
+        Fl::repeat_timeout(m_appState.asd.delay / 1000.0, staticDoARoll, this);
         std::string lab = m_localizer.gt(5) + std::to_string(m_cc);
         m_btnStart->copy_label(lab.c_str());
     } else {
@@ -211,7 +211,7 @@ void MainWindow::startRoll()
         }
         m_outputName->redraw();
     } else {
-        m_cc = static_cast<int>(m_appState.ast / 100);
+        m_cc = static_cast<int>(m_appState.asd.time);
         Fl::add_timeout(0, staticDoARoll, this);
     }
 }

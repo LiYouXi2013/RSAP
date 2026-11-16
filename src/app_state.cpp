@@ -141,9 +141,15 @@ bool AppState::loadFromIni(const std::string& iniPathin)
     }
 
     seed     = j.value("Seed", 0u);
-    ast      = j.value("AST", 1500);
     showCons = j.value("ShowCons", 0) != 0;
     lang     = j.value("Language", "en-US");
+
+    json jasd;
+    if(j.is_object() && j.contains("ASD") && j["ASD"].is_object()){
+        jasd = j["ASD"];
+        asd.delay = jasd.value("Delay",100);
+        asd.time = jasd.value("Time",15);
+    }
 
     persons.clear();
     if (j.is_object() && j.contains("People") && j["People"].is_array()) {
@@ -183,9 +189,14 @@ bool AppState::saveToIni(const std::string& iniPathin)
 
     json j;
     j["Seed"]     = isDefaultSeed ? 0u : seed;
-    j["AST"]      = static_cast<uint32_t>(ast);
     j["ShowCons"] = static_cast<int>(showCons);
     j["Language"] = lang;
+
+    json jasd = json::object();
+    jasd["Delay"] = asd.delay;
+    jasd["Time"] = asd.time;
+    j["ASD"] = jasd;
+
 
     j["People"] = json::array();
     for (const auto& p : persons) {

@@ -123,7 +123,8 @@ namespace GeneralSettingsDialog
         RandomSelector &sel;
         UpdateChecker &uc;
         VI *viSeed = nullptr;
-        VI *viAst = nullptr;
+        VI *viAsDelay = nullptr;
+        VI *viAsTime = nullptr;
         Fl_Window *wnd = nullptr;
         Fl_Check_Button *btnHideCons = nullptr;
     };
@@ -137,7 +138,8 @@ namespace GeneralSettingsDialog
     static void cbOk(Fl_Widget*, void* ud)
     {
         DialogCtx* ctx = reinterpret_cast<DialogCtx *>(ud);
-        ctx->state.ast = ctx->viAst->value();
+        ctx->state.asd.delay = ctx->viAsDelay->value();
+        ctx->state.asd.time = ctx->viAsTime->value();
         ctx->state.showCons = ctx->btnHideCons->value();
         ctx->sel.setSeed(ctx->state.seed);
         ctx->realState = ctx->state;
@@ -154,19 +156,29 @@ namespace GeneralSettingsDialog
     {
         int px = parent ? parent->x() - 100 : 100;
         int py = parent ? parent->y() - 100 : 100;
-        Fl_Window wnd(px, py, 235, 207, "Settings");
+        Fl_Window wnd(px, py, 235, 220, "Settings");
         wnd.set_modal();
 
         AppState stateToBeChanged = state;
         DialogCtx ctx{state, stateToBeChanged, sel, uc};
         ctx.wnd = &wnd;
 
-        ctx.viAst = new VI(151, 10, 64, 22, "");
-        ctx.viAst->value(state.ast);
-        ctx.viAst->copy_label(tr.gt(14).c_str());
-        Fl_Box* rsb = new Fl_Box(42, 45, 148, 20, "");
+        Fl_Group *asgrp = new Fl_Group(0, 20, 235, 59);
+        asgrp->copy_label(tr.gt(28).c_str());
+        asgrp->box(FL_BORDER_BOX);
+
+        ctx.viAsDelay = new VI(151, 25, 64, 22, "");
+        ctx.viAsDelay->value(state.asd.delay);
+        ctx.viAsDelay->copy_label(tr.gt(14).c_str());
+        ctx.viAsTime = new VI(151, 50, 64, 22, "");
+        ctx.viAsTime->value(state.asd.time);
+        ctx.viAsTime->copy_label(tr.gt(27).c_str());    
+        
+        asgrp->end();
+
+        Fl_Box* rsb = new Fl_Box(42, 85, 148, 20, "");
         rsb->copy_label(tr.gt(15).c_str());
-        ctx.viSeed = new VI(42, 65, 148, 22, "");
+        ctx.viSeed = new VI(42, 105, 148, 22, "");
         ctx.viSeed->value(state.seed);
         ctx.viSeed->callback([](Fl_Widget * a, void* ud) {
             VI* vi = (VI*)a;
@@ -178,11 +190,11 @@ namespace GeneralSettingsDialog
             }
         }, &ctx);
 
-        Fl_Button* btnCheck = new Fl_Button(43, 95, 155, 20, "");
+        Fl_Button* btnCheck = new Fl_Button(43, 135, 155, 20, "");
         btnCheck->callback(cbCheckUpdate, &ctx);
         btnCheck->copy_label(tr.gt(16).c_str());
 
-        Fl_Check_Button* btnHideConsole = new Fl_Check_Button(42, 125, 148, 22, "");
+        Fl_Check_Button* btnHideConsole = new Fl_Check_Button(42, 165, 148, 22, "");
         btnHideConsole->value(state.showCons);
         btnHideConsole->callback([](Fl_Widget * a, void*) {
             ShowHideConsole(GetConsoleWindowHandle(), ((Fl_Check_Button*)a)->value());
@@ -191,11 +203,11 @@ namespace GeneralSettingsDialog
 
         ctx.btnHideCons = btnHideConsole;
 
-        Fl_Button* btnOk = new Fl_Button(127, 153, 64, 20, "");
+        Fl_Button* btnOk = new Fl_Button(127, 193, 64, 20, "");
         btnOk->callback(cbOk, &ctx);
         btnOk->copy_label(tr.gt(18).c_str());
 
-        Fl_Button* btnCancel = new Fl_Button(42, 153, 64, 20, "");
+        Fl_Button* btnCancel = new Fl_Button(42, 193, 64, 20, "");
         btnCancel->callback(cbCancel, &ctx);
         btnCancel->copy_label(tr.gt(19).c_str());
 

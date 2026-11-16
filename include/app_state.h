@@ -28,7 +28,9 @@ public:
     bool saveToIni(const std::string& iniPathin = "settings.ini");
 
     uint32_t seed = 0;
-    uint32_t ast = 0;
+    struct AutoStopDat{
+        int delay,time;
+    }asd;
     bool isDefaultSeed = false;
     bool showCons = false;
     personVec persons;

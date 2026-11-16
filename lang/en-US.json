@@ -15,7 +15,7 @@
         "About",
         "OK",
         "Settings",
-        "Auto Stop Time:",
+        "Auto Stop Delay:",
         "Seed",
         "Check For Update",
         "Show Console",
@@ -27,6 +27,7 @@
         "Remove",
         "Language",
         "You should restart RSAP after changing language.",
-        "No one to be picked"
+        "No one to be picked",
+        "Auto Stop Time:"
     ]
 }
