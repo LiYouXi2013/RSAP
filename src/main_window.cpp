@@ -89,7 +89,7 @@ MainWindow::MainWindow(int X, int Y, int W, int H, const char *title,
       m_localizer(locallizer)
 {
     m_disp = new RFO(0, 0, 300, 188);
-    m_disp->fontsize(200);
+    m_disp->fontsize(180);
     m_disp->textcolor(static_cast<Fl_Color>(228));
     m_disp->value("??");
     add(m_disp);
@@ -279,6 +279,11 @@ void MainWindow::openMoreDialog()
     }, &nameMap);
 
     int i = 0;
+    try {
+        fs::directory_iterator("./lang/");
+    } catch(...) {
+        fs::create_directory("lang");
+    }
     for (const auto &entry : fs::directory_iterator("./lang/")) {
         if (entry.is_regular_file()) {
             langChooser->add(getLangName(entry.path().string().c_str()).c_str());
