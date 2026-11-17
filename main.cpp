@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     system("chcp 65001>nul");
     spdlogInit();
     auto l = get_logger("rsap.main");
-    l->info("SpdLog Initalized");
+    l->info("SpdLog Initialized");
 
     json j;
     {

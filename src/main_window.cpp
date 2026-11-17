@@ -89,7 +89,6 @@ MainWindow::MainWindow(int X, int Y, int W, int H, const char *title,
       m_localizer(locallizer)
 {
     m_disp = new RFO(0, 0, 300, 188);
-    m_disp->box(FL_PLASTIC_DOWN_BOX);
     m_disp->fontsize(200);
     m_disp->textcolor(static_cast<Fl_Color>(228));
     m_disp->value("??");
@@ -97,19 +96,15 @@ MainWindow::MainWindow(int X, int Y, int W, int H, const char *title,
 
     m_btnStart = new Fl_Button(190, 247, 86, 30, "");
     m_btnStart->callback(cbStart, this);
-    m_btnStart->box(FL_PLASTIC_UP_BOX);
-    m_btnStart->down_box(FL_PLASTIC_DOWN_BOX);
     m_btnStart->labelfont(1);
     m_btnStart->copy_label(locallizer.gt(0).c_str());
 
     m_cbAutoStop = new Fl_Check_Button(190, 218, 86, 28, "");
-    m_cbAutoStop->down_box(FL_DOWN_BOX);
     m_cbAutoStop->labelfont(1);
     m_cbAutoStop->callback(cbAutoStopToggle, this);
     m_cbAutoStop->copy_label(locallizer.gt(1).c_str());
 
     m_outputName = new Fl_Output(0, 188, 180, 60);
-    m_outputName->box(FL_THIN_DOWN_BOX);
     m_outputName->textfont(FL_TIMES);
     m_outputName->textsize(60);
 
@@ -121,12 +116,11 @@ MainWindow::MainWindow(int X, int Y, int W, int H, const char *title,
     m_btnHide = new Fl_Button(220, 290, 80, 30, "");
     m_btnHide->labelcolor(FL_BLUE);
     m_btnHide->labelsize(30);
-    m_btnHide->box(FL_FLAT_BOX);
     m_btnHide->callback(cbHide, this);
     m_btnHide->copy_label(locallizer.gt(3).c_str());
+    m_btnHide->box(FL_NO_BOX);
 
     m_btnMore = new Fl_Button(50, 263, 86, 30, "");
-    m_btnMore->box(FL_PLASTIC_UP_BOX);
     m_btnMore->labelfont(1);
     m_btnMore->callback(cbMore, this);
     m_btnMore->copy_label(locallizer.gt(4).c_str());
@@ -142,7 +136,6 @@ MainWindow::MainWindow(int X, int Y, int W, int H, const char *title,
     m_floatWnd->set_modal();
     m_floatWnd->border(0);
     Fl_Button *showBtn = new Fl_Button(0, 0, 36, 36, "");
-    showBtn->box(FL_PLASTIC_UP_BOX);
     showBtn->callback(cbFloatShow, this);
     showBtn->copy_label(locallizer.gt(6).c_str());
     m_floatWnd->end();
@@ -251,8 +244,8 @@ void MainWindow::openMoreDialog()
     btnGen->copy_label(m_localizer.gt(8).c_str());
     Fl_Button *btnPer = new Fl_Button(10, 69, 58, 28, "");
     btnPer->copy_label(m_localizer.gt(9).c_str());
-    btnGen->box(FL_PLASTIC_UP_BOX);
-    btnPer->box(FL_PLASTIC_UP_BOX);
+    Fl_Button *btnApr = new Fl_Button(84, 25, 58, 28, "");
+    btnApr->copy_label(m_localizer.gt(29).c_str());
     grpSet->end();
 
     Fl_Input_Choice *inputSettingsFileNameInput = new Fl_Input_Choice(100, 263, 120, 22, "");
@@ -301,10 +294,8 @@ void MainWindow::openMoreDialog()
     }
 
     Fl_Button *btnAbout = new Fl_Button(60, 293, 64, 22, "");
-    btnAbout->box(FL_PLASTIC_UP_BOX);
     btnAbout->copy_label(m_localizer.gt(11).c_str());
     Fl_Button *btnOk = new Fl_Button(141, 293, 64, 22, "");
-    btnOk->box(FL_PLASTIC_UP_BOX);
     btnOk->copy_label(m_localizer.gt(12).c_str());
 
     btnGen->callback([](Fl_Widget *, void *ud) {
