@@ -17,6 +17,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "utils.h"
+#include "os-themes.h"
+#include <FL/Fl.H>
 #include <cctype>
 #include "spdlog_helper.h"
 
@@ -75,3 +77,66 @@ std::shared_ptr<spdlog::logger> get_logger(const std::string& name)
     return l;
 }
 
+/* 
+* Themes
+* 
+* FLTK--Built In
+*  1Plastic 2GTK+ 3Gleam 4Oxy
+* OS-themes lib
+   0native 5classic 6aero 7metro 8aqua 9greybird 10metal 11blue 12dark
+*/
+void setTheme(int id){
+    switch (id) {    
+    case 1:
+        Fl::scheme("plastic");
+        break;
+
+    case 2:
+        Fl::scheme("gtk+");
+        break;
+
+    case 3:
+        Fl::scheme("gleam");
+        break;
+
+    case 4:
+        Fl::scheme("oxy");
+        break;
+
+    case 5:
+        OS::use_classic_theme();
+        break;
+
+    case 6:
+        OS::use_aero_theme();
+        break;
+
+    case 7:
+        OS::use_metro_theme();
+        break;
+
+    case 8:
+        OS::use_aqua_theme();
+        break;
+
+    case 9:
+        OS::use_greybird_theme();
+        break;
+
+    case 10:
+        OS::use_metal_theme();
+        break;
+
+    case 11:
+        OS::use_blue_theme();
+        break;
+
+    case 12:
+        OS::use_dark_theme();
+        break;
+
+    default:
+        OS::use_native_theme();
+        break;
+    }
+}

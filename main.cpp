@@ -65,6 +65,8 @@ int main(int argc, char **argv)
     appState.loadFromIni(settingsName);
     l->info("Configurations read");
 
+    setTheme(appState.theme);
+
     i18n localizer(appState.lang);
 
     RandomSelector selector;
@@ -78,8 +80,8 @@ int main(int argc, char **argv)
     Fl::set_font(FL_TIMES, "Huiwen-Fangsong");
 
     MainWindow wnd(Fl::w() - 400, Fl::h() - 420, 300, 320, "RSAP", appState, selector, updateChecker, localizer);
-    wnd.show();
-    Fl::get_system_colors();
+    wnd.show(argc, argv);
+
     Fl::lock();
 
     return Fl::run();

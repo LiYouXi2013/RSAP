@@ -163,7 +163,7 @@ namespace GeneralSettingsDialog
         DialogCtx ctx{state, stateToBeChanged, sel, uc};
         ctx.wnd = &wnd;
 
-        Fl_Group *asgrp = new Fl_Group(0, 20, 235, 59);
+        Fl_Group *asgrp = new Fl_Group(5, 20, 230, 59);
         asgrp->copy_label(tr.gt(28).c_str());
         asgrp->box(FL_BORDER_BOX);
 

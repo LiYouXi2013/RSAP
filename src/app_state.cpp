@@ -143,6 +143,7 @@ bool AppState::loadFromIni(const std::string& iniPathin)
     seed     = j.value("Seed", 0u);
     showCons = j.value("ShowCons", 0) != 0;
     lang     = j.value("Language", "en-US");
+    theme    = j.value("Theme", 0);
 
     json jasd;
     if(j.is_object() && j.contains("ASD") && j["ASD"].is_object()){
@@ -191,6 +192,7 @@ bool AppState::saveToIni(const std::string& iniPathin)
     j["Seed"]     = isDefaultSeed ? 0u : seed;
     j["ShowCons"] = static_cast<int>(showCons);
     j["Language"] = lang;
+    j["Theme"]    = theme;
 
     json jasd = json::object();
     jasd["Delay"] = asd.delay;

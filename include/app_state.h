@@ -35,4 +35,5 @@ public:
     bool showCons = false;
     personVec persons;
     std::string lang = "en-US";
+    int theme;
 };

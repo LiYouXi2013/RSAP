@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "dialogs/about_dialog.h"
 #include "dialogs/general_settings_dialog.h"
 #include "dialogs/person_settings_dialog.h"
+#include "dialogs/appearance_dialog.h"
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Choice.H>
 #include <FL/platform.H>
@@ -30,8 +31,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
-
-std::string tmpLang;
 
 #ifdef _WIN32
 #include <windows.h>
@@ -226,11 +225,12 @@ void MainWindow::restoreFromFloat()
     show();
 }
 
+bool cngTh = false;
+
 void MainWindow::openMoreDialog()
 {
     auto l = get_logger("ui.morewnd");
-
-    tmpLang = m_appState.lang;
+    
     lastSN = settingsName;
     Fl::remove_timeout(staticKeepOnTop, this);
     Fl_Double_Window moreWnd(x() - 100, y() - 100, 220, 330);
@@ -268,35 +268,7 @@ void MainWindow::openMoreDialog()
         }
     }
 
-    std::vector<std::string> nameMap;
-
-    Fl_Choice *langChooser = new Fl_Choice(100, 233, 120, 22, "");
-    langChooser->copy_label(m_localizer.gt(24).c_str());
-    langChooser->callback([](Fl_Widget * a, void* ud) {
-        Fl_Choice *ll = (Fl_Choice*)a;
-        std::vector<std::string> *nameMap = (std::vector<std::string> *)ud;
-        tmpLang = nameMap->at(ll->value());
-    }, &nameMap);
-
-    int i = 0;
-    try {
-        fs::directory_iterator("./lang/");
-    } catch(...) {
-        fs::create_directory("lang");
-    }
-    for (const auto &entry : fs::directory_iterator("./lang/")) {
-        if (entry.is_regular_file()) {
-            langChooser->add(getLangName(entry.path().string().c_str()).c_str());
-
-            if (m_appState.lang == entry.path().stem().string()) {
-                langChooser->value(i);
-            }
-
-            nameMap.push_back(entry.path().stem().string());
-        }
-
-        i++;
-    }
+    
 
     Fl_Button *btnAbout = new Fl_Button(60, 293, 64, 22, "");
     btnAbout->copy_label(m_localizer.gt(11).c_str());
@@ -311,6 +283,11 @@ void MainWindow::openMoreDialog()
     btnPer->callback([](Fl_Widget *, void *ud) {
         auto* p = reinterpret_cast<MainWindow *>(ud);
         PersonSettingsDialog::showModal(p, p->m_appState, p->m_selector, p->m_localizer);
+    }, this);
+
+    btnApr->callback([](Fl_Widget *, void *ud) {
+        auto* p = reinterpret_cast<MainWindow *>(ud);
+        AppearanceSettingsDialog::showModal(p, p->m_appState, p->m_localizer);
     }, this);
 
     inputSettingsFileNameInput->callback([](Fl_Widget * wg, void *ud) {
@@ -333,10 +310,6 @@ void MainWindow::openMoreDialog()
     btnOk->callback([](Fl_Widget *, void *ud) {
         auto l = get_logger("ui.morewnd.onOk");
         auto* p = reinterpret_cast<uploadOK *>(ud);
-        if (p->mainwnd->m_appState.lang != tmpLang){
-            fl_alert(p->mainwnd->m_localizer.gt(25).c_str());
-        }
-        p->mainwnd->m_appState.lang = tmpLang;
         p->mainwnd->m_appState.saveToIni(lastSN);
         p->mainwnd->m_appState.loadFromIni(settingsName);
 
@@ -356,8 +329,13 @@ void MainWindow::openMoreDialog()
 
     moreWnd.end();
     moreWnd.show();
-    while (moreWnd.shown())
+    while (moreWnd.shown()) {
+        if (cngTh) {
+            this->redraw();
+            moreWnd.redraw();
+        }
         Fl::wait();
+    }
     Fl::repeat_timeout(0.5, staticKeepOnTop, this);
 }
 

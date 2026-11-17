@@ -36,3 +36,4 @@ using personVec = std::vector<Person>;
 personVec readInt(const std::string& t);
 std::string join(const personVec &v);
 std::shared_ptr<spdlog::logger> get_logger(const std::string& name);
+void setTheme(int id);
