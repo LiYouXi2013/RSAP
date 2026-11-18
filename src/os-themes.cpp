@@ -183,7 +183,6 @@ void use_classic_font() {
 }
 
 static void use_classic_scheme() {
-	Fl::scheme("none");
 	Fl::set_boxtype(OS_BUTTON_UP_BOX, classic_button_up_box, 2, 2, 4, 4);
 	Fl::set_boxtype(OS_CHECK_DOWN_BOX, classic_check_down_box, 2, 2, 4, 4);
 	Fl::set_boxtype(OS_BUTTON_UP_FRAME, classic_button_up_frame, 2, 2, 4, 4);

@@ -65,8 +65,6 @@ int main(int argc, char **argv)
     appState.loadFromIni(settingsName);
     l->info("Configurations read");
 
-    setTheme(appState.theme);
-
     i18n localizer(appState.lang);
 
     RandomSelector selector;
@@ -81,6 +79,8 @@ int main(int argc, char **argv)
 
     MainWindow wnd(Fl::w() - 400, Fl::h() - 420, 300, 320, "RSAP", appState, selector, updateChecker, localizer);
     wnd.show(argc, argv);
+    
+    setTheme(appState.theme, &wnd);
 
     Fl::lock();
 

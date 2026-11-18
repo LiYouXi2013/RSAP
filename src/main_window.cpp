@@ -329,10 +329,17 @@ void MainWindow::openMoreDialog()
 
     moreWnd.end();
     moreWnd.show();
+
+    setTheme(m_appState.theme, &moreWnd);
+
     while (moreWnd.shown()) {
         if (cngTh) {
             this->redraw();
             moreWnd.redraw();
+            setTheme(m_appState.theme, &moreWnd);
+            setTheme(m_appState.theme, this);
+
+            cngTh = false;
         }
         Fl::wait();
     }

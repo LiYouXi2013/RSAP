@@ -5,3 +5,6 @@ https://www.fltk.org/
 
 2. **spdlog**, Copyright (c) 2016 Gabi Melman，MIT License
 https://github.com/gabime/spdlog
+
+3. **OS-Theme**, Copyright (c) 2021 MoAlyousef，No License
+https://github.com/MoAlyousef/fltk_theme_demo

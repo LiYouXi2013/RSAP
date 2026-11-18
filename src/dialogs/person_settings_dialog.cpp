@@ -141,6 +141,9 @@ namespace PersonSettingsDialog
 
         wnd.end();
         wnd.show();
+
+        setTheme(state.theme, &wnd);
+        
         while (wnd.shown()) Fl::wait();
     }
 }

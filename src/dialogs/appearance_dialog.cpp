@@ -74,10 +74,6 @@ namespace AppearanceSettingsDialog
         Fl_Choice *themeChooser = new Fl_Choice(100, 140, 120, 22, "");
         themeChooser->copy_label(tr.gt(30).c_str());
         themeChooser->add("Native");
-        themeChooser->add("Plastic");
-        themeChooser->add("GTK+");
-        themeChooser->add("Gleam");
-        themeChooser->add("Oxy");
         themeChooser->add("Classic");
         themeChooser->add("Aero");
         themeChooser->add("Metro");
@@ -93,8 +89,9 @@ namespace AppearanceSettingsDialog
             Fl_Choice *ll = (Fl_Choice*)a;
             DialogCtx *ctx = (DialogCtx*)ud;
             ctx->state.theme = ll->value();
-            setTheme(ll->value());
+            setTheme(ll->value(), ctx->wnd);
             ctx->wnd->redraw();
+            cngTh = true;
         }, &ctx);
         
 
@@ -138,6 +135,9 @@ namespace AppearanceSettingsDialog
 
         wnd.end();
         wnd.show();
+
+        setTheme(state.theme, &wnd);
+
         while (wnd.shown()) Fl::wait();
     }
 }

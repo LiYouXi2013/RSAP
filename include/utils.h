@@ -23,6 +23,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <iostream>
 #include <memory>
 
+#include <FL/Fl_Window.H>
+
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
@@ -36,4 +38,4 @@ using personVec = std::vector<Person>;
 personVec readInt(const std::string& t);
 std::string join(const personVec &v);
 std::shared_ptr<spdlog::logger> get_logger(const std::string& name);
-void setTheme(int id);
+void setTheme(int id, Fl_Window *a);

@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "utils.h"
 #include "os-themes.h"
 #include <FL/Fl.H>
+#include <FL/platform.H>
 #include <cctype>
 #include "spdlog_helper.h"
 
@@ -79,59 +80,68 @@ std::shared_ptr<spdlog::logger> get_logger(const std::string& name)
 
 /* 
 * Themes
-* 
-* FLTK--Built In
-*  1Plastic 2GTK+ 3Gleam 4Oxy
 * OS-themes lib
-   0native 5classic 6aero 7metro 8aqua 9greybird 10metal 11blue 12dark
+   0native 1classic 2aero 3metro 4aqua 5greybird 6metal 7blue 8dark
 */
-void setTheme(int id){
-    switch (id) {    
+#ifdef _WIN32
+
+#define WIN32_LEAN_AND_MEAN 
+#include <windows.h>
+#include <dwmapi.h>
+
+void set_fltk_dark_title(Fl_Window* win, bool dark = true) {
+	if (!win || !win->shown()) return;
+	
+	HWND hwnd = fl_xid(win);
+	if (!hwnd) return;
+	
+	BOOL bDark = dark ? TRUE : FALSE;
+	
+	HRESULT hr = DwmSetWindowAttribute(hwnd, 20, &bDark, sizeof(bDark));
+	
+	if (FAILED(hr)) {
+		DwmSetWindowAttribute(hwnd, 19, &bDark, sizeof(bDark));
+	}
+	SendMessage(hwnd, WM_NCACTIVATE, FALSE, 0);
+	SendMessage(hwnd, WM_NCACTIVATE, TRUE, 0);
+}
+#endif
+
+void setTheme(int id, Fl_Window *a){
+#ifdef _WIN32
+    set_fltk_dark_title(a, id == 8);
+#endif
+
+    switch (id) {
     case 1:
-        Fl::scheme("plastic");
-        break;
-
-    case 2:
-        Fl::scheme("gtk+");
-        break;
-
-    case 3:
-        Fl::scheme("gleam");
-        break;
-
-    case 4:
-        Fl::scheme("oxy");
-        break;
-
-    case 5:
         OS::use_classic_theme();
         break;
 
-    case 6:
+    case 2:
         OS::use_aero_theme();
         break;
 
-    case 7:
+    case 3:
         OS::use_metro_theme();
         break;
 
-    case 8:
+    case 4:
         OS::use_aqua_theme();
         break;
 
-    case 9:
+    case 5:
         OS::use_greybird_theme();
         break;
 
-    case 10:
+    case 6:
         OS::use_metal_theme();
         break;
 
-    case 11:
+    case 7:
         OS::use_blue_theme();
         break;
 
-    case 12:
+    case 8:
         OS::use_dark_theme();
         break;
 
