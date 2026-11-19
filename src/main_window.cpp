@@ -172,7 +172,11 @@ void MainWindow::doARoll()
     m_isRolling = true;
     int ii = m_selector.randomPick();
     m_disp->value(std::to_string(ii + 1).c_str());
-    m_outputName->value(m_selector.getPersonList()[ii].name.c_str());
+    try {
+        m_outputName->value(m_selector.getPersonList().at(ii).name.c_str());
+    } catch (...) {
+        m_outputName->value(m_localizer.gt(26).c_str());
+    }
     m_outputName->redraw();
     m_cc--;
     if (m_cc > 0) {
@@ -244,7 +248,7 @@ void MainWindow::openMoreDialog()
     btnGen->copy_label(m_localizer.gt(8).c_str());
     Fl_Button *btnPer = new Fl_Button(10, 69, 58, 28, "");
     btnPer->copy_label(m_localizer.gt(9).c_str());
-    Fl_Button *btnApr = new Fl_Button(84, 25, 58, 28, "");
+    Fl_Button *btnApr = new Fl_Button(84, 25, 78, 28, "");
     btnApr->copy_label(m_localizer.gt(29).c_str());
     grpSet->end();
 
